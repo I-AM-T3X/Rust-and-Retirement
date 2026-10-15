@@ -37,7 +37,7 @@ Your retirement goal is **5000 gold**.
 
 ## Adventures
 
-Adventures take real time, from 10 seconds for the easy stuff up to a full minute for the big ones.
+Adventures take real time, from 10 seconds for the easy stuff up to a full minute for the big ones. While you wait, the adventure plays out in the journal as its own card that reads top to bottom. Every quest has two hand-written storylines, and one gets picked each time. The story uses your actual gear, so your shield blocks the claws and your helm takes the rocks. The last line tells you which piece took the worst of it.
 
 There are 37 adventures in rotation. The board shows 6 at a time: Haul Crates plus five random picks from the rest. It rerolls every new morning. Don't like today's board? Hit **Reroll** for a fresh one. The first reroll each day costs 5 silver, and every reroll after that costs double the last (5s, 1g, 2g, 4g, and so on). The price resets every morning. A failed adventure pays only 25% and wears your gear down 50% more.
 
@@ -205,6 +205,6 @@ All the numbers live at the top of `game.js`:
 - `JOBS` holds each adventure's power requirement, time, pay range, wear, energy cost, loot chances, and materials
 - `GEAR_BASES` holds the names used for gear drops
 - `INJURIES`, `SEASONS`, `WEATHER`, and `MILESTONES` hold the new systems
-- `STORY`, `STORY_ROAD`, and `GOODBYE` hold all the journal writing
+- `STORY`, `STORY_ROAD`, and `GOODBYE` hold all the journal writing. Each quest in `STORY` has an opening (`go`), two storylines (`paths`), and success and failure endings. Use `{weapon}`, `{shield}`, `{armor}`, `{helm}`, or `{boots}` to mention a piece of gear.
 
 All money values are stored in copper, so `500000` means 5000 gold.

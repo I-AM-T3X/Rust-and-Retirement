@@ -131,339 +131,424 @@ const JOBS = [
   {key:"lich",tier:6,name:"The Drowned Lich",where:"Sunken Abbey",min:59,secs:58,pay:[12500,17500],wear:40,energy:56,loot:0.18,gearDrop:0.07,mat:{name:"Lich's Phylactery Shard",icon:"skull",v:[16000,26000]},prefix:"Lichbane"},
   {key:"reunion",tier:6,name:"One Last Dungeon",where:"Hollowdeep",min:60,secs:60,pay:[13500,19000],wear:44,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ancient Crown",icon:"medal",v:[19000,29000]},prefix:"Hero's"}
 ];
-// Story beats shown in the journal during adventures. {gear} becomes a random piece of your equipped gear.
+// Story: each quest has two hand-written storylines (paths). One is picked per trip and played in order.
+// {weapon} {shield} {armor} {helm} {boots} become your equipped gear, or a body part if that slot is empty.
 const STORY = {
  "docks": {
   "go": [
-   "You roll up your sleeves at the docks. The foreman points at a mountain of crates."
+   "The foreman at the docks takes one look at you and points at the biggest stack of crates."
   ],
-  "beats": [
-   "A crate of fish slips and you catch it with your knee. Ow.",
-   "The sailors bet on whether the old adventurer can keep up. You keep up.",
-   "Your back makes a noise you've never heard before.",
-   "Somebody's parrot keeps calling you grandpa.",
-   "A dockhand asks if you're the one from the songs. You say no. You are.",
-   "You find a crate labeled DO NOT DROP. You carry that one very carefully."
+  "paths": [
+   [
+    "You find a rhythm: lift, turn, stack. It's almost like swinging a sword, minus the glory.",
+    "A crate of salted fish splits open on your shoulder. You smell like low tide for the rest of the shift."
+   ],
+   [
+    "Two young dockhands bet you won't last until noon. By noon, they're the ones sitting down.",
+    "A sailor recognizes you from an old wanted poster. He decides not to mention it, and neither do you."
+   ]
   ],
   "win": [
-   "The last crate hits the dock. The foreman nods, which is high praise from him.",
-   "The ship sails on time. The foreman tosses you an apple on top of your pay."
+   "The last crate thuds into the hold. The foreman grunts, which is the nicest thing he's ever said to anyone.",
+   "The ship casts off on time. The foreman tosses you an apple with your pay."
   ],
   "lose": [
-   "You drop a crate of wine. The foreman takes it out of your pay.",
-   "You pull something in your shoulder and spend the afternoon sitting on a barrel."
+   "Your back seizes up halfway through the shift. You spend the afternoon on a barrel, watching younger men do your job.",
+   "A crate of wine slips off your shoulder and bursts on the dock. The foreman takes it out of your pay."
   ]
  },
  "herbs": {
   "go": [
-   "You head into Willow Hollow with a basket and a borrowed pair of shears."
+   "The apothecary hands you a basket, a pair of shears, and a drawing of moonleaf that could be any plant at all."
   ],
-  "beats": [
-   "Moonleaf only grows in the shade. Naturally, it's all down a steep ravine.",
-   "You find a patch and kneel down. Getting back up is the hard part.",
-   "A squirrel watches you work and seems unimpressed.",
-   "You mistake a nettle for moonleaf. Your hand reminds you for an hour.",
-   "The quiet is nice. You could get used to this kind of work."
+  "paths": [
+   [
+    "Moonleaf only grows in deep shade, which in Willow Hollow means the bottom of a muddy ravine.",
+    "You fill half the basket before you realize your knees have locked up. Getting back up takes a while."
+   ],
+   [
+    "A squirrel watches you work, chewing something smugly. You suspect it ate the good patch.",
+    "You find a whole grove of moonleaf beside a stream. It's quiet here. You stay a little longer than you need to."
+   ]
   ],
   "win": [
-   "Your basket's full and smells like mint and rain. The apothecary pays on the spot."
+   "Your basket smells like mint and rain. The apothecary pays on the spot and asks if you're free next week."
   ],
   "lose": [
-   "Half your basket turns out to be weeds. The apothecary laughs and pays you for the rest."
+   "Half your basket turns out to be nettles. The apothecary laughs, sorts out the real moonleaf, and pays you for that."
   ]
  },
  "rooster": {
   "road": false,
   "go": [
-   "Farmer Fenwick waves you over. His prize rooster has escaped again, along with the whole flock."
+   "Farmer Fenwick's prize rooster has escaped again, and this time he took the whole flock with him."
   ],
-  "beats": [
-   "The rooster stands on the fence and stares you down like a dragon would.",
-   "You dive for a hen and catch only a mouthful of straw.",
-   "The rooster pecks your {gear}. It leaves a mark. Somehow.",
-   "Fenwick shouts helpful advice from the porch. None of it is helpful.",
-   "You corner the flock behind the barn. They look at you, then at each other.",
-   "You notice the farm is for sale. You file that away."
+  "paths": [
+   [
+    "The rooster stands on a fence post and stares you down like a dragon would.",
+    "You dive for a hen and come up with a mouthful of straw. Fenwick claps from the porch anyway."
+   ],
+   [
+    "You corner the flock behind the barn. Twenty chickens look at you, then at each other, then scatter.",
+    "Between dives, you notice the sign on Fenwick's gate. The farm is for sale. You file that away."
+   ]
   ],
   "win": [
-   "The last hen goes in the coop. The rooster gives you a look of grudging respect."
+   "The last hen goes into the coop. The rooster gives you a long look of grudging respect."
   ],
   "lose": [
-   "The rooster escapes into the woods. Fenwick pays you for the hens, at least."
+   "The rooster escapes into the woods with half the flock. Fenwick pays you for the hens you did catch."
   ]
  },
  "rats": {
   "go": [
-   "You climb down into a damp cellar in Old Town, torch in hand.",
-   "The innkeeper locks the cellar door behind you. For safety, he says."
+   "The innkeeper hands you a torch, points at the cellar door, and locks it behind you. For safety, he says."
   ],
-  "beats": [
-   "Something squeaks in the dark. Then something else squeaks back.",
-   "A rat the size of a dog lunges at you. Your {gear} takes the bite.",
-   "You find a nest behind the barrels. It's a lot of rats.",
-   "One runs up your leg. You do a little dance nobody needs to see.",
-   "Your torch sputters. The squeaking gets closer.",
-   "There's a rat wearing a tiny crown. You decide not to ask."
+  "paths": [
+   [
+    "The squeaking starts the moment your torch reaches the bottom step. Hundreds of little eyes catch the light.",
+    "A rat the size of a terrier goes for your ankle. {boots} save you from a nasty bite."
+   ],
+   [
+    "Behind the ale barrels you find the nest, and on top of the nest, a rat wearing a bottle cap like a crown.",
+    "The rat king squeaks an order and the whole cellar comes at you at once. {weapon} gets a workout."
+   ]
   ],
   "win": [
-   "The last rat goes down. The cellar is quiet except for your breathing.",
-   "The innkeeper unlocks the door and hands you a mug of ale before you even ask."
+   "The last rat flees through a crack in the wall. The innkeeper unlocks the door and hands you an ale before you ask."
   ],
   "lose": [
-   "The rats swarm. You scramble up the stairs with your pride in tatters.",
-   "The rat king escapes into the walls. The innkeeper pays you half and sighs."
+   "The swarm drives you back up the stairs. You pound on the door until the innkeeper lets you out, looking embarrassed for you."
   ]
  },
  "wolves": {
   "go": [
-   "You head out to Hollow Fen. A shepherd says the wolves took three sheep this week."
+   "A shepherd at Hollow Fen says wolves have taken three sheep this week. He looks at your gray beard and sighs."
   ],
-  "beats": [
-   "Howling starts up on all sides. You count at least six voices.",
-   "Tracks in the mud lead deeper into the reeds than you'd like.",
-   "A wolf darts in and bites at your {gear}. Then it's gone again.",
-   "You build a fire and wait. Old trick. Still works.",
-   "The pack leader is huge, gray, and missing an ear. It looks as tired as you."
+  "paths": [
+   [
+    "The howling starts at dusk, from every side of the fen at once.",
+    "You build a fire and put your back to a rock. Old trick. The wolves circle just outside the light.",
+    "The first one darts in and snaps at {armor}. Then the rest decide to try their luck."
+   ],
+   [
+    "You follow tracks through the reeds until the mud is up to your shins.",
+    "The pack leader steps out of the fog. Huge, gray, missing an ear. It looks about as tired as you.",
+    "It lunges. You catch its jaws on {shield} and shove it back into the reeds."
+   ]
   ],
   "win": [
-   "The pack scatters across the fen and doesn't come back. The shepherd is very grateful."
+   "The pack scatters across the fen and doesn't come back. The shepherd gives you a wheel of cheese on top of your pay."
   ],
   "lose": [
-   "The wolves wear you down until you have to fall back. The shepherd pays you for trying."
+   "The wolves wear you down until you have to fall back to the farm. The shepherd pays you for trying and starts building a taller fence."
   ]
  },
  "goblins": {
   "go": [
-   "You head into Thornwood. The smoke from the goblin camp isn't hard to find."
+   "You head into Thornwood. The goblin camp isn't hard to find. You can smell their stew from a mile away."
   ],
-  "beats": [
-   "A rock bounces off your {gear}. Then twenty more.",
-   "A goblin in a cooking-pot helmet yells something rude about your age.",
-   "You knock over their stew. They take that personally.",
-   "Their chieftain charges you on a very confused goat.",
-   "A goblin tries to sell you your own boot.",
-   "You find a wanted poster of yourself from twenty years ago. You look great."
+  "paths": [
+   [
+    "A sentry spots you and screams. Every goblin in camp grabs the nearest rock.",
+    "Rocks rain down. One rings off {helm} hard enough to make your ears whistle.",
+    "A goblin in a cooking pot helmet yells something about your age. His friends think it's hilarious."
+   ],
+   [
+    "You walk right into camp while they're eating. Thirty goblins freeze with their spoons halfway up.",
+    "You kick over the stew pot. That turns out to be the worst insult in all of goblin culture.",
+    "Their chieftain charges you on a very confused goat. You sidestep, and the goat keeps going."
+   ]
   ],
   "win": [
-   "The goblins scatter into the trees, yelling that this isn't over. It's over.",
-   "The chieftain surrenders his goat. You let him keep it."
+   "The goblins scatter into the trees, shouting that this isn't over. It's over.",
+   "The chieftain surrenders, sulking. You let him keep the goat."
   ],
   "lose": [
-   "There are way more goblins than the bounty said. You retreat, pelted with rocks the whole way.",
-   "The goat headbutts you into a bush. The goblins cheer."
+   "There are three times as many goblins as the bounty said. You retreat through the trees with rocks bouncing off you the whole way."
   ]
  },
  "crypt": {
   "go": [
-   "The priest at Ashby hands you a torch and a bucket of holy water. He doesn't come in."
+   "The priest at Ashby hands you a bucket of holy water and stays well outside the churchyard gate."
   ],
-  "beats": [
-   "The crypt door groans open. Something inside groans back.",
-   "Skeletons climb out of the walls, rattling and clacking.",
-   "A bony hand grabs your {gear}. You shake it off. It keeps shaking.",
-   "You find the grave of an old party member. You stop to pay your respects.",
-   "The holy water works great until you run out of it.",
-   "Candles light themselves one by one down the hall. That's never good."
+  "paths": [
+   [
+    "The crypt door groans open. Something deep inside groans back.",
+    "Skeletons climb out of the walls, their bones clacking like wind chimes.",
+    "A bony hand clamps onto {armor} and won't let go, even after the rest of the skeleton falls apart."
+   ],
+   [
+    "Candles light themselves one by one down the hallway as you walk. That's never a good sign.",
+    "You pass the tomb of an old party member and stop for a moment, even with the dead closing in.",
+    "The holy water works great, right up until the bucket runs dry."
+   ]
   ],
   "win": [
-   "The last skeleton falls still. The crypt finally goes quiet. The priest blesses you twice."
+   "The last skeleton crumbles and the crypt goes still. The priest blesses you twice, just to be safe."
   ],
   "lose": [
-   "The dead are too many and too restless. You back out and bar the door behind you."
+   "There are too many restless dead. You back out, slam the door, and help the priest nail it shut."
   ]
  },
  "escort": {
   "go": [
-   "The caravan rolls out onto the Salt Road. The merchants look nervous."
+   "The spice caravan rolls out onto the Salt Road. Six wagons, four nervous merchants, and you."
   ],
-  "beats": [
-   "Day one passes quietly. Too quietly, says the cook. He says that every day.",
-   "A wagon wheel breaks. You spend an hour holding up a wagon.",
-   "Bandits on the ridge! Arrows thunk into your {gear}.",
-   "The spice merchant tries to haggle your pay down in the middle of the ambush.",
-   "A sandstorm rolls in. You march with your eyes shut.",
-   "The merchant's kid asks for war stories every night. You tell the good ones."
+  "paths": [
+   [
+    "The first day is quiet. Too quiet, says the cook. He says that every day.",
+    "A wagon wheel cracks on a rock, and you spend an hour holding the wagon up while they fix it.",
+    "Bandits on the ridge! Arrows thud into the wagons, and one sticks in {shield}.",
+    "In the middle of the ambush, the spice merchant tries to renegotiate your pay."
+   ],
+   [
+    "A sandstorm rolls in, and you march with your eyes squeezed shut and one hand on the lead wagon.",
+    "The merchant's daughter asks for war stories every night. You tell her the good ones and leave out the rest.",
+    "On the third night you hear footsteps in the dark. You're up with {weapon} before the bandits reach the wagons.",
+    "The bandit leader is just a kid. You give him one chance to run."
+   ]
   ],
   "win": [
-   "The caravan rolls into town with every wagon intact. The merchants are all smiles.",
-   "The kid gives you a drawing of you fighting the bandits. You keep it."
+   "The caravan rolls into town with every wagon intact. The merchant's daughter gives you a drawing of the fight. You keep it."
   ],
   "lose": [
-   "The bandits make off with two wagons. The merchants pay you, but only barely."
+   "The bandits make off with two wagons of pepper. The merchants pay you, barely, and complain the whole time."
   ]
  },
  "bridge": {
   "go": [
-   "Bandits have taken over the bridge at Ferris Crossing and are charging a toll. You go to pay it. With your fists."
+   "Bandits have taken the bridge at Ferris Crossing and are charging a toll. You go to pay it. With your fists."
   ],
-  "beats": [
-   "The bandit boss says the toll is five silver. You tell him the toll is now you.",
-   "Two bandits rush you at once. Your {gear} catches a club.",
-   "Someone gets knocked into the river. It isn't you, this time.",
-   "The bandit boss pulls out a crossbow. You pull out thirty years of experience.",
-   "A farmer with a cart waits patiently for the fight to finish."
+  "paths": [
+   [
+    "The bandit boss says the toll is five silver. You tell him the toll is now you.",
+    "Two of his men rush you at once. A club bounces off {helm} and you see stars.",
+    "Someone goes over the railing into the river. For once, it isn't you.",
+    "The boss pulls out a crossbow. You pull out thirty years of experience."
+   ],
+   [
+    "You walk up slowly, like a tired old man, which isn't hard. The bandits don't even stand up.",
+    "You knock the first one into the river before the others realize what's happening.",
+    "The rest come at you swinging. {armor} takes a beating, but it holds.",
+    "A farmer with a cart waits patiently for the fight to finish so he can cross."
+   ]
   ],
   "win": [
-   "The bandits jump into the river and swim for it. The farmer crosses for free."
+   "The bandits jump into the river and swim for it. The farmer crosses for free and tips his hat to you."
   ],
   "lose": [
-   "You end up in the river, soaked and sore. The bandits laugh, but they leave the bridge."
+   "You end up in the river, soaked and sore. The bandits laugh, but they're gone from the bridge by morning anyway."
   ]
  },
  "mine": {
   "go": [
-   "The miners at Copperdeep say the lower tunnels are haunted. Nobody's been down there in weeks."
+   "The miners at Copperdeep say the lower tunnels are haunted. Nobody has gone down there in weeks."
   ],
-  "beats": [
-   "Your lantern shows old pickaxes left right where they were dropped.",
-   "Ghostly tapping echoes from deep in the rock.",
-   "A cart rolls toward you on its own. You jump out of the way just in time.",
-   "A pale shape drifts out of the wall and passes right through your {gear}. It's freezing.",
-   "The ghost is an old miner who just wants someone to finish his shift.",
-   "Part of the ceiling collapses behind you. You'll have to find another way out."
+  "paths": [
+   [
+    "Your lantern finds old pickaxes lying exactly where they were dropped.",
+    "Ghostly tapping echoes up from deep in the rock, steady as a heartbeat.",
+    "An ore cart rolls at you on its own. You dive out of the way and land hard on {armor}.",
+    "A pale shape drifts out of the wall. It's an old miner, still swinging his pick at nothing."
+   ],
+   [
+    "The air gets colder with every ladder you climb down.",
+    "Part of the ceiling caves in behind you. You'll need another way out.",
+    "The ghost passes straight through {helm}. It feels like having your head dunked in a frozen lake.",
+    "He only wants someone to finish his last shift. He was three carts short."
+   ]
   ],
   "win": [
-   "You help the ghost finish his last shift, and he finally fades away smiling. The tunnels go quiet."
+   "You fill the last three carts with him. The old miner smiles, tips his helmet, and finally fades away. The tunnels go quiet."
   ],
   "lose": [
-   "The ghost won't be calmed. You run out of lantern oil and feel your way back to daylight."
+   "Your lantern runs out of oil. You feel your way back to daylight, and the tapping follows you the whole way up."
   ]
  },
  "ogre": {
   "go": [
-   "You reach Millbrook. The miller's cart is upside down in a tree."
+   "You reach Millbrook. The miller's cart is upside down in a tree, and the miller is missing."
   ],
-  "beats": [
-   "You follow huge footprints and a trail of half-eaten cabbages.",
-   "The ogre is napping on a pile of flour sacks. He wakes up grumpy.",
-   "He swings a whole fence post. Your {gear} takes the hit and groans.",
-   "You find the miller. He's fine, just very annoyed and covered in flour.",
-   "The ogre sneezes flour all over you. You both stop to cough.",
-   "He picks you up by the ankle. You've been here before. You know what to do."
+  "paths": [
+   [
+    "You follow footprints the size of washtubs and a trail of half-eaten cabbages.",
+    "The ogre is napping on a pile of flour sacks. He wakes up grumpy.",
+    "He swings an entire fence post. {shield} takes the hit, and your arm goes numb to the elbow.",
+    "He grabs you by the ankle and dangles you upside down. You've been here before. You know what to do."
+   ],
+   [
+    "You find the miller first, tied up in a sack and very annoyed about it.",
+    "The ogre comes back with an armful of stolen pies and catches you untying his lunch.",
+    "He sneezes, and a cloud of flour blinds you both. You fight by sound.",
+    "His fist catches {armor} and sends you rolling into the reeds by the millpond."
+   ]
   ],
   "win": [
-   "The ogre goes down with a thud that rattles every window in Millbrook. The village cheers.",
-   "The miller bakes you a loaf of bread the size of a shield."
+   "The ogre goes down with a thud that rattles every window in Millbrook. The miller bakes you a loaf of bread the size of a shield."
   ],
   "lose": [
-   "The ogre tosses you into the millpond. You get the miller out, but the ogre gets away."
+   "The ogre tosses you into the millpond. You get the miller out, but the ogre wanders off with the pies."
   ]
  },
  "troll": {
   "go": [
-   "You wade into Mirewater. The mud tries to steal your boots with every step."
+   "You wade into Mirewater. The mud tries to steal {boots} with every step."
   ],
-  "beats": [
-   "The smell hits you before the troll does.",
-   "The troll rises out of the bog, dripping and grinning.",
-   "You cut it. It heals. You cut it again. It heals again.",
-   "Its fist slams into your {gear}. You fly backward into the muck.",
-   "You remember the old rule: fire or acid. You have neither. You improvise.",
-   "Swamp leeches find their way into places leeches should not be."
+  "paths": [
+   [
+    "The smell hits you long before the troll does.",
+    "It rises out of the bog, dripping and grinning, with half a canoe stuck in its teeth.",
+    "You cut it. It heals. You cut it again. It heals again. This is going to take a while.",
+    "Its fist slams into {armor} and you fly backward into the muck."
+   ],
+   [
+    "Leeches find their way into places leeches should never be.",
+    "You remember the old rule about trolls. Fire or acid. You brought neither.",
+    "You lure it toward a dead tree and hope your plan is better than it sounds.",
+    "It swipes at you and catches {shield}, nearly tearing it off your arm."
+   ]
   ],
   "win": [
-   "You trap the troll under a fallen tree and set the whole thing ablaze. It doesn't get back up."
+   "You bring the dead tree down on it and set the whole thing ablaze. The troll doesn't get back up this time."
   ],
   "lose": [
-   "The troll just won't stay down. You crawl out of the swamp and spend an hour pulling off leeches."
+   "The troll just won't stay down. You crawl out of the swamp and spend an hour picking off leeches."
   ]
  },
  "wyvern": {
   "go": [
-   "You start the long climb up the Gray Cliffs. The wind tries to throw you off."
+   "You start the long climb up the Gray Cliffs. The wind does its best to peel you off the rock."
   ],
-  "beats": [
-   "A shadow passes overhead. Then it circles back.",
-   "The nest is full of eggs, bones, and one very angry parent.",
-   "The wyvern's tail slams into your {gear}. Something cracks.",
-   "You hang off a ledge by one hand. Your knees file a formal complaint.",
-   "Its poison stinger misses you by an inch. You feel the breeze.",
-   "You find the bones of the last adventurer who tried this. Bad sign."
+  "paths": [
+   [
+    "Halfway up, a shadow passes over you. Then it circles back for a better look.",
+    "You haul yourself onto the ledge and find the nest. Eggs, bones, and one very angry parent.",
+    "The wyvern screams and dives. You get {shield} up just as the claws hit.",
+    "Its tail whips around, stinger first, and misses your face by the width of a finger.",
+    "You drive {weapon} into its wing, and it lurches off the ledge, shrieking."
+   ],
+   [
+    "The handholds are slick with rain. Your fingers ache, and your knees file a formal complaint.",
+    "Near the top, you find the bones of the last adventurer who tried this. Bad sign.",
+    "The wyvern lands between you and the nest, wings spread as wide as a barn.",
+    "Its tail catches {armor} and slams you against the cliff face.",
+    "You hang off the edge by one hand for a long, long moment."
+   ]
   ],
   "win": [
-   "The wyvern flees into the clouds. You climb down with the loot strapped to your back."
+   "The wyvern flees into the clouds. You climb down slowly with the loot strapped to your back."
   ],
   "lose": [
-   "The wyvern drives you off the cliffs. You slide most of the way down on your backside."
+   "The wyvern drives you off the ledge. You slide most of the way down the cliff on your backside."
   ]
  },
  "necro": {
   "go": [
-   "The village of Blackmoor is empty. A man in robes has been raising their dead to plow his fields."
+   "Blackmoor is empty of the living. A man in robes has been raising the village dead to plow his fields."
   ],
-  "beats": [
-   "Zombies in straw hats shamble across the fields. Some of them are actually pretty good at farming.",
-   "The necromancer sees you coming and sighs. He was hoping for a quiet day.",
-   "A wall of bone rises out of the ground. Your {gear} cracks right through it.",
-   "He tries to raise a skeleton dragon. He only gets the tail.",
-   "You realize he's about your age. He tells you he's retiring too, after this harvest.",
-   "Cold magic washes over you. Your bones ache more than usual. A lot more."
+  "paths": [
+   [
+    "Zombies in straw hats shamble across the furrows. Some of them are honestly pretty good at farming.",
+    "The necromancer sees you coming and sighs. He was hoping for a quiet day.",
+    "A wall of bone erupts from the ground. You smash through it, and {weapon} comes out chipped.",
+    "He tries to raise a skeleton dragon. He only gets the tail, which flops around uselessly.",
+    "Up close, you realize he's about your age. He says he's retiring after this harvest too."
+   ],
+   [
+    "The fog in Blackmoor is cold and thick, and it smells like turned earth.",
+    "Dead farmhands stop working as you pass and turn their heads to watch you.",
+    "Cold magic washes over you. Your bones ache more than usual. A lot more.",
+    "A skeletal plow horse charges you. {shield} catches its skull and sends it tumbling.",
+    "The necromancer offers you tea. You both know how this ends, but you take the tea."
+   ]
   ],
   "win": [
-   "The necromancer surrenders and agrees to try regular farming. The dead of Blackmoor lie back down."
+   "The necromancer surrenders and agrees to try regular farming. The dead of Blackmoor lie back down in their graves."
   ],
   "lose": [
-   "His undead farmhands chase you off the fields. Honestly, they're better farmers than you'll be."
+   "His undead farmhands chase you off the fields. Honestly, they're better farmers than you'll ever be."
   ]
  },
  "giant": {
   "go": [
-   "A hill giant has parked himself across the Highpass and won't let anyone through."
+   "A hill giant has parked himself across the Highpass, and nobody gets through without paying."
   ],
-  "beats": [
-   "The giant sits on a boulder, picking his teeth with a tree trunk.",
-   "He throws a rock the size of a cottage. You dive behind another rock.",
-   "His foot comes down right next to you. The ground shakes.",
-   "You climb up his leg. He swats at you like a mosquito and catches your {gear}.",
-   "He challenges you to a riddle contest instead. You lose the riddle contest.",
-   "Turns out he just wants someone to talk to. You talk. Then you fight anyway."
+  "paths": [
+   [
+    "He's sitting on a boulder, picking his teeth with a pine tree.",
+    "He spots you and throws a rock the size of a cottage. You dive behind a smaller rock.",
+    "His foot comes down right beside you, and the whole mountainside shakes.",
+    "You climb his leg. He swats at you like a mosquito and catches {armor}.",
+    "From his shoulder, you can see the whole valley. It's beautiful. You hit him in the ear."
+   ],
+   [
+    "He challenges you to a riddle contest before any fighting. You lose the riddle contest.",
+    "Turns out he's lonely and just wants someone to talk to. You talk for an hour.",
+    "Then he asks for the toll, and the conversation is over.",
+    "His club whistles down. {shield} takes it, and you skid back three paces.",
+    "You go for his ankle, the same way you did with his cousin twenty years ago."
+   ]
   ],
   "win": [
-   "The giant topples off the pass and lands with a boom you feel in your teeth. The road is open."
+   "The giant topples off the pass with a boom you feel in your teeth. The road is open again."
   ],
   "lose": [
-   "The giant kicks you all the way back down the mountain path. Merchants still have to go around."
+   "The giant kicks you all the way back down the mountain path. The merchants will still have to go around."
   ]
  },
  "rival": {
   "go": [
-   "A letter arrives with an old crest on it. Your rival from the old days wants one last duel.",
-   "You head to Dunmore Arena. The crowd is bigger than you expected."
+   "A letter arrives sealed with an old crest. Your rival from the old days wants one last duel at Dunmore Arena."
   ],
-  "beats": [
-   "Your rival steps into the sand. Older, grayer, and still smug.",
-   "He opens with the same move he used thirty years ago. You still remember the counter.",
-   "Steel rings on steel. His blade bites into your {gear}.",
-   "The crowd starts chanting your old nickname. You'd forgotten it. You'd forgotten them.",
-   "You both stop to catch your breath at the same time. Neither of you mentions it.",
-   "He whispers that he's retiring after this too. A vineyard, he says."
+  "paths": [
+   [
+    "The crowd is bigger than you expected. Someone is selling roasted nuts with your face on the bag.",
+    "Your rival steps onto the sand. Older, grayer, and still smug.",
+    "He opens with the same move he used thirty years ago. You still remember the counter.",
+    "Steel rings on steel, and his blade bites into {armor}.",
+    "The crowd starts chanting your old nickname. You'd forgotten it. You'd forgotten them."
+   ],
+   [
+    "You run into him in the tunnel before the bout. Neither of you says anything for a long moment.",
+    "The first exchange is fast and ugly. You're both slower than you used to be. Neither of you mentions it.",
+    "His blade glances off {helm}, and the crowd gasps.",
+    "You both stop to catch your breath at the same time and almost laugh.",
+    "He tells you, quietly, that he's retiring after this too. A vineyard, he says."
+   ]
   ],
   "win": [
-   "You disarm him with your last bit of strength. He laughs, shakes your hand, and invites you to visit the vineyard.",
+   "You disarm him with the last of your strength. He laughs, shakes your hand, and invites you to visit the vineyard.",
    "The crowd roars. Your rival bows to you for the first time in thirty years."
   ],
   "lose": [
-   "He knocks you down and offers you a hand up. The crowd still cheers for you anyway.",
+   "He knocks you flat, then offers you a hand up. The crowd cheers for you anyway.",
    "You lose, but it's the best fight you've had in years. He buys the drinks after."
   ]
  },
  "drake": {
   "go": [
-   "You climb Cinder Peak. The rocks are warm. Then hot.",
-   "Old instincts kick in. This is the kind of job you used to live for."
+   "You climb Cinder Peak. The rocks are warm. Then hot. Then you stop touching them."
   ],
-  "beats": [
-   "The Ashen Drake opens one eye. It remembers you. You remember it.",
-   "Fire rolls over you. The only thing between you and it is your {gear}.",
-   "You land a hit that would've made your younger self proud.",
-   "Its claws rake across your {gear}. The sound is awful.",
-   "Your lungs burn. Your arms burn. Honestly, everything burns.",
-   "It roars so loud the rocks start to fall. You keep your footing. Barely.",
-   "You spot the scar you gave it decades ago. It spots yours."
+  "paths": [
+   [
+    "The Ashen Drake opens one eye as you crest the ridge. It remembers you. You remember it.",
+    "Fire rolls over the ridge, and the only thing between you and it is {shield}.",
+    "You land a hit that would've made your younger self proud.",
+    "Its claws rake across {armor}. The sound is awful.",
+    "It roars so loud the rocks start to slide. You keep your footing. Barely."
+   ],
+   [
+    "Old instincts kick in. This is the kind of job you used to live for.",
+    "You spot the scar you gave it decades ago, right above its left eye.",
+    "It spots yours, too.",
+    "Its tail sweeps the ledge and catches {boots}, nearly sending you over the edge.",
+    "Your lungs burn. Your arms burn. Honestly, everything burns."
+   ]
   ],
   "win": [
-   "The Ashen Drake crashes down the mountain. You sit on a rock for a long time, just breathing.",
-   "The drake falls. Below, the whole valley sees the smoke stop rising."
+   "The Ashen Drake crashes down the mountainside. You sit on a warm rock for a long time, just breathing.",
+   "The drake falls. Down in the valley, people watch the smoke over Cinder Peak finally stop."
   ],
   "lose": [
    "The drake's fire drives you off the peak. You live, which is more than most can say."
@@ -473,34 +558,40 @@ const STORY = {
   "go": [
    "The postmaster hands you a sack of letters and a map with half the roads crossed out."
   ],
-  "beats": [
-   "A dog chases you down the lane. You haven't run this fast since the goblin wars.",
-   "Old Widow Pell invites you in for tea. You can't say no to Widow Pell.",
-   "One letter is addressed to you. It's a bill from twenty years ago.",
-   "Your {gear} snags on a mailbox. The mailbox wins.",
-   "A farmer asks you to read his letter aloud. It's from his mother. You both get a little misty."
+  "paths": [
+   [
+    "A farm dog chases you down the lane. You haven't run that fast since the goblin wars.",
+    "Old Widow Pell invites you in for tea. Nobody says no to Widow Pell."
+   ],
+   [
+    "One of the letters is addressed to you. It's a bill from twenty years ago.",
+    "A farmer asks you to read his letter aloud. It's from his mother. You both get a little misty."
+   ]
   ],
   "win": [
    "Every letter delivered. The postmaster says you're the fastest carrier he's had all year. He's had two."
   ],
   "lose": [
-   "You drop the sack in a creek. Half the village is getting soggy mail this week."
+   "You drop the sack crossing a creek. Half of Willowmere is getting soggy mail this week."
   ]
  },
  "sheep": {
   "road": false,
   "go": [
-   "The farmers at Brambleton need help shearing. The sheep do not want to be sheared."
+   "The farmers at Brambleton need help with shearing. The sheep have not agreed to this."
   ],
-  "beats": [
-   "The first sheep kicks you square in the chest. You respect it.",
-   "You pin a ram down. It looks at you like you owe it money.",
-   "There is wool in places wool should never be.",
-   "A lamb follows you around all morning. You try not to get attached.",
-   "You catch yourself pricing out sheep for your own farm. Two, maybe three."
+  "paths": [
+   [
+    "The first ewe kicks you square in the chest. You respect it.",
+    "You pin a ram down. It looks at you like you owe it money."
+   ],
+   [
+    "There is wool in places wool should never be.",
+    "A lamb follows you around all morning. You catch yourself pricing out sheep for your own farm."
+   ]
   ],
   "win": [
-   "You've sheared the whole flock. The sheep look naked and furious. The farmers look delighted."
+   "The whole flock is sheared. The sheep look naked and furious. The farmers look delighted."
   ],
   "lose": [
    "The flock breaks through the fence and scatters across three fields. The farmers sigh and pay you anyway."
@@ -508,54 +599,65 @@ const STORY = {
  },
  "bees": {
   "go": [
-   "The orchard keeper at Honeyvale says the bees have gone wild and nobody can reach the apples."
+   "The keeper at Honeyvale Orchard says the bees have gone wild, and nobody can get near the apples."
   ],
-  "beats": [
-   "The hive is the size of a wagon. The buzzing is the size of a war.",
-   "A bee gets inside your {gear}. Then a few more.",
-   "You light a smoke pot. The bees get sleepy. So do you.",
-   "You get stung on the nose. It swells up like a turnip.",
-   "The queen bee is enormous and clearly in charge."
+  "paths": [
+   [
+    "The hive is the size of a hay wagon, and the buzzing is the size of a war.",
+    "A bee crawls inside {helm}. Then a few of its friends join it."
+   ],
+   [
+    "You light a smoke pot. The bees get drowsy. So do you.",
+    "One gets you right on the nose. It swells up like a turnip."
+   ]
   ],
   "win": [
-   "The bees calm down and settle into a new hive box. The keeper gives you a jar of honey on top of your pay."
+   "The swarm settles into a new hive box. The keeper sends you home with a jar of honey on top of your pay."
   ],
   "lose": [
-   "You run for the river with half the hive behind you. You come out puffy but alive."
+   "You sprint for the river with half the hive behind you. You come out puffy, but alive."
   ]
  },
  "pumpkin": {
   "road": false,
   "go": [
-   "The farmers at Gourdfield grew a pumpkin the size of a cart. They need someone strong to haul it to the fair."
+   "Gourdfield grew a pumpkin the size of a cart, and the fair is tomorrow. They need someone with a strong back."
   ],
-  "beats": [
-   "You try to lift it. It does not move. You try again with your legs.",
-   "Three farmers push, you pull, and the pumpkin finally rolls onto the cart.",
-   "The cart axle groans. Your {gear} groans. You groan.",
-   "A crow lands on top of the pumpkin and refuses to leave.",
-   "You can't help thinking about what you'd grow on your own farm."
+  "paths": [
+   [
+    "You try to lift it. It doesn't move. You try again, with your legs this time.",
+    "Three farmers push, you pull, and the pumpkin finally rolls onto the cart. The axle groans. So do you."
+   ],
+   [
+    "A crow lands on top of the pumpkin and refuses to leave. It rides along the whole way.",
+    "Hauling it down the road, you can't stop thinking about what you'll plant on your own farm."
+   ]
   ],
   "win": [
    "The pumpkin wins first prize at the fair. The farmers carry you around on their shoulders for a minute."
   ],
   "lose": [
-   "The pumpkin rolls off the cart and down a hill. You chase it all the way to the river. It floats."
+   "The pumpkin rolls off the cart and down the hill. You chase it all the way to the river. It floats."
   ]
  },
  "spiders": {
   "go": [
-   "The miller says something's been living in the old loft. Something with a lot of legs."
+   "The miller says something has moved into the old mill loft. Something with a lot of legs."
   ],
-  "beats": [
-   "Webs hang from every beam, thick as curtains.",
-   "You hear tiny feet skittering above you. Then big feet.",
-   "A spider the size of a dog drops down in front of your face.",
-   "Webbing sticks to your {gear}. You'll be picking it off for weeks.",
-   "You find a whole cocoon of stolen flour sacks. The miller will be thrilled."
+  "paths": [
+   [
+    "Webs hang from every beam, thick as curtains.",
+    "You hear tiny feet skittering above you. Then you hear big feet.",
+    "A spider the size of a dog drops down right in front of your face. {weapon} is already moving."
+   ],
+   [
+    "You climb the ladder slowly. The rungs are sticky.",
+    "Webbing gets all over {armor}. You'll be picking it off for weeks.",
+    "Behind the millstone, you find a pile of wrapped-up flour sacks. The miller will be thrilled."
+   ]
   ],
   "win": [
-   "The nest is cleared out and the loft is quiet. The miller says he'll finally sleep tonight."
+   "The loft is cleared out and quiet. The miller says he'll finally get a good night's sleep."
   ],
   "lose": [
    "You get so tangled in web that the miller has to cut you loose with a bread knife."
@@ -563,53 +665,66 @@ const STORY = {
  },
  "tavern": {
   "go": [
-   "The Rusty Flagon needs a bouncer for the night. A caravan of sailors just came in."
+   "The Rusty Flagon needs a bouncer tonight. A ship full of sailors just made port."
   ],
-  "beats": [
-   "The first fight breaks out before you've even sat down.",
-   "A sailor swings a chair at you. Your {gear} takes most of it.",
-   "You toss two brawlers out the door. Then they come back in through the window.",
-   "The bard keeps playing like nothing's happening. Respect.",
-   "Someone recognizes you from the old days and buys a round for the whole room. The fighting stops for exactly one song."
+  "paths": [
+   [
+    "The first fight breaks out before you've even found a stool.",
+    "A sailor swings a chair at you. {armor} takes most of it. The chair takes the rest."
+   ],
+   [
+    "You toss two brawlers out the front door. They come back in through the window.",
+    "Someone recognizes you from the old days and buys a round for the whole room. The fighting stops for exactly one song."
+   ]
   ],
   "win": [
-   "By closing time, the tavern is still mostly standing. The owner calls that a win and pays you double."
+   "By closing time, the Flagon is still mostly standing. The owner calls that a win and pays you double."
   ],
   "lose": [
-   "The brawl spills into the street and takes out the front window. The owner pays you, but he's not happy."
+   "The brawl spills into the street and takes out the front window. The owner pays you, but he isn't happy about it."
   ]
  },
  "kobolds": {
   "go": [
-   "Kobolds have dug tunnels all under Clayhill and the houses are starting to sink."
+   "Kobolds have tunneled under Clayhill, and the houses are starting to sink."
   ],
-  "beats": [
-   "The tunnels are kobold sized. You are not kobold sized.",
-   "Tiny traps go off all around you. Most of them miss.",
-   "A kobold yells something at you and his friends laugh.",
-   "A cave-in drops dirt all over your {gear}.",
-   "You find their boss sitting on a throne made of stolen spoons."
+  "paths": [
+   [
+    "The tunnels are kobold sized. You are very much not kobold sized.",
+    "Tiny traps snap shut all around you. One clamps onto {boots}.",
+    "A kobold yells something from the dark, and his friends cackle."
+   ],
+   [
+    "You crawl on your elbows through the clay, cursing every inch.",
+    "A section of tunnel collapses and buries {helm} in dirt.",
+    "Deep inside, you find their boss sitting on a throne made of stolen spoons."
+   ]
   ],
   "win": [
    "The kobolds pack up and move to a different hill. Clayhill throws you a small but heartfelt party."
   ],
   "lose": [
-   "You crawl out of a collapsed tunnel covered in clay from head to toe. The kobolds are still there."
+   "You crawl out of a collapsed tunnel covered head to toe in clay. The kobolds are still down there."
   ]
  },
  "smugglers": {
   "go": [
-   "The harbor guard at Saltmarsh suspects smugglers are using an old sea cave. They want someone to check it out quietly."
+   "The harbor guard at Saltmarsh thinks smugglers are using an old sea cave. They want someone to check it out quietly."
   ],
-  "beats": [
-   "You wade in at low tide. The water is very cold and very fast.",
-   "You hear voices and barrels rolling across stone.",
-   "A smuggler spots you and blows a whistle. So much for quiet.",
-   "A cutlass bounces off your {gear}. Close one.",
-   "The smuggler captain offers you a cut of the profits. It's tempting. It's very tempting."
+  "paths": [
+   [
+    "You wade in at low tide. The water is cold enough to stop your heart.",
+    "You hear voices and barrels rolling over stone. Then a smuggler spots you and blows a whistle. So much for quiet.",
+    "A cutlass bounces off {shield}. Close one."
+   ],
+   [
+    "The cave is lit with stolen lanterns and stacked high with untaxed brandy.",
+    "You hide behind a barrel and listen. They're planning a big run tonight.",
+    "The captain finds you and offers you a cut. It's tempting. It's very tempting."
+   ]
   ],
   "win": [
-   "The smugglers are rounded up and the harbor guard seizes the whole stash. They let you keep a bottle of brandy."
+   "The smugglers are rounded up and the guard seizes the whole stash. They let you keep a bottle of brandy for your trouble."
   ],
   "lose": [
    "The tide comes in and you have to swim out empty-handed. The smugglers wave goodbye from their boat."
@@ -620,33 +735,43 @@ const STORY = {
   "go": [
    "The farmers at Harrow Fields swear their scarecrow has been walking around at night."
   ],
-  "beats": [
-   "The scarecrow is gone from its post. There are straw footprints leading into the corn.",
-   "Crows circle overhead, cawing like they're trying to warn you.",
-   "The scarecrow steps out of the corn and tilts its head at you.",
-   "It hits a lot harder than straw should. Your {gear} takes the blow.",
-   "You find a hedge witch's charm stitched into its coat."
+  "paths": [
+   [
+    "The scarecrow is gone from its post. Straw footprints lead into the corn.",
+    "Crows circle overhead, cawing like they're trying to warn you.",
+    "It steps out of the corn and tilts its burlap head at you."
+   ],
+   [
+    "You wait in the field until dark. The corn starts rustling with no wind.",
+    "It hits a lot harder than straw should. {armor} takes the blow.",
+    "You spot a hedge witch's charm stitched into its coat."
+   ]
   ],
   "win": [
-   "You pull out the charm and the scarecrow slumps over, just straw again. The farmers put it back on its post, a little nervously."
+   "You rip out the charm and the scarecrow slumps over, just straw again. The farmers put it back on its post, a little nervously."
   ],
   "lose": [
-   "The scarecrow chases you all the way out of the cornfield. The farmers decide to leave it alone."
+   "The scarecrow chases you all the way out of the cornfield. The farmers decide to leave it alone for now."
   ]
  },
  "boar": {
   "go": [
-   "A boar the size of a horse has been tearing up Oakhollow Woods. The hunters won't go near it."
+   "A boar the size of a horse has been tearing up Oakhollow Woods, and the hunters won't go near it."
   ],
-  "beats": [
-   "You follow a trail of uprooted trees. That's a big boar.",
-   "It charges out of the brush faster than anything that big should move.",
-   "Its tusks slam into your {gear} and lift you off your feet.",
-   "You climb a tree to catch your breath. Your knees hate you.",
-   "The boar circles the tree, snorting and waiting."
+  "paths": [
+   [
+    "You follow a trail of uprooted trees. That's a big boar.",
+    "It explodes out of the brush faster than anything that big has any right to move.",
+    "Its tusks catch {shield} and lift you clean off your feet."
+   ],
+   [
+    "You climb a tree to catch your breath. Your knees hate you for it.",
+    "The boar circles the tree below, snorting and waiting.",
+    "You drop onto its back with {weapon} ready. It does not appreciate that."
+   ]
   ],
   "win": [
-   "The great boar finally goes down. The hunters spend the whole night telling the story, and it gets bigger every time."
+   "The great boar finally goes down. The hunters tell the story all night, and it gets bigger every time."
   ],
   "lose": [
    "The boar chases you clear out of the woods. You decide that's the boar's forest now."
@@ -654,17 +779,24 @@ const STORY = {
  },
  "witch": {
   "go": [
-   "The Bog Witch of Murkwater has been cursing travelers. The town wants her gone. Or at least, quieter."
+   "The Bog Witch of Murkwater has been cursing travelers. The town wants her gone. Or at least quieter."
   ],
-  "beats": [
-   "Her hut stands on chicken legs. It turns to look at you.",
-   "She offers you a deal. You can't tell if she's joking.",
-   "A curse hits your {gear} and it goes cold as ice.",
-   "Her cauldron bubbles over and the whole bog smells like boiled socks.",
-   "She asks about your plans. You tell her about the farm. She gets quiet."
+  "paths": [
+   [
+    "Her hut stands on chicken legs. It turns to look at you as you come up the path.",
+    "She meets you at the door and offers you a deal. You can't tell if she's joking.",
+    "A curse hits {armor}, and frost spreads across it in a heartbeat.",
+    "Her cauldron boils over, and the whole bog smells like hot socks."
+   ],
+   [
+    "Bog lights float over the water, trying to lead you off the path.",
+    "She asks what you're planning to do once you retire. You tell her about the farm.",
+    "She goes quiet for a while. Then she asks what you're planning to grow.",
+    "Her cat hisses at you the entire time. It seems to be the one in charge."
+   ]
   ],
   "win": [
-   "You and the witch strike a bargain. She'll leave travelers alone, and you'll send her a basket of vegetables every harvest."
+   "You strike a bargain. She leaves travelers alone, and you send her a basket of vegetables every harvest."
   ],
   "lose": [
    "She turns your hair green and sends you packing. It washes out after a few days. Mostly."
@@ -672,17 +804,24 @@ const STORY = {
  },
  "lighthouse": {
   "go": [
-   "Something has been climbing out of the sea and attacking the lighthouse at Gull Point."
+   "Something has been climbing out of the sea at night and attacking the lighthouse at Gull Point."
   ],
-  "beats": [
-   "The keeper is barricaded at the top. He waves at you, then points down.",
-   "Crab men scuttle up the rocks, clacking their claws.",
-   "A wave crashes over you and nearly washes you off the cliff.",
-   "A claw clamps down on your {gear}. It takes three tries to shake it off.",
-   "The lighthouse lamp goes dark. You fight in the moonlight."
+  "paths": [
+   [
+    "The keeper is barricaded at the top. He waves at you, then points frantically down.",
+    "Crab men scuttle up the rocks, clacking their claws in rhythm.",
+    "A wave crashes over you and almost drags you off the cliff.",
+    "A claw clamps down on {shield}. It takes three tries to shake it loose."
+   ],
+   [
+    "You climb the spiral stairs to the lamp room. The keeper has been up there for three days.",
+    "The lamp goes dark. You fight by moonlight.",
+    "Something big comes out of the water behind the crab men. It's their queen.",
+    "Her pincer catches {helm}, and your ears ring for a week."
+   ]
   ],
   "win": [
-   "The last crab man drops into the sea and the lamp flickers back on. Ships in the harbor ring their bells for you."
+   "The last crab man drops back into the sea and the lamp flickers on. Every ship in the harbor rings its bell for you."
   ],
   "lose": [
    "You hold them off long enough for the keeper to escape, but the crab men take the lighthouse."
@@ -692,69 +831,97 @@ const STORY = {
   "go": [
    "Kingsbridge is holding its village tourney, and the prize money is real. The other fighters are a third your age."
   ],
-  "beats": [
-   "A young knight laughs when he sees you sign up. You remember his face.",
-   "Your first opponent goes down in two swings. The crowd starts paying attention.",
-   "The joust is rough. A lance cracks against your {gear}.",
-   "Between rounds, a kid asks if you're a real adventurer. You say you used to be.",
-   "The final match is against the knight who laughed. You stop being polite."
+  "paths": [
+   [
+    "A young knight laughs out loud when you sign up. You remember his face.",
+    "Your first opponent goes down in two swings. The crowd starts paying attention.",
+    "The joust is rough. A lance cracks against {shield} and splinters.",
+    "Between rounds, a kid asks if you're a real adventurer. You tell him you used to be."
+   ],
+   [
+    "You stretch for a long time before the first bout. The young fighters snicker. You let them.",
+    "Your second opponent is fast but sloppy. You wait for the mistake.",
+    "A blunted sword clips {helm} and you go down on one knee.",
+    "The final match is against the knight who laughed. You stop being polite."
+   ]
   ],
   "win": [
    "You win the whole tourney. The young knight shakes your hand and asks for tips. You give him one."
   ],
   "lose": [
-   "You lose in the final, but the crowd is chanting your name as you leave the field."
+   "You lose in the final, but the crowd is chanting your name as you limp off the field."
   ]
  },
  "basilisk": {
   "go": [
-   "Workers keep turning to stone at Stonefall Quarry. Everyone knows what that means."
+   "Workers at Stonefall Quarry keep turning to stone. Everyone knows what that means."
   ],
-  "beats": [
-   "The quarry is full of statues. Very lifelike statues.",
-   "You polish your {gear} to a mirror shine. Old trick.",
-   "You hear it slithering just around the corner.",
-   "You fight with your eyes half closed, going by sound alone.",
-   "Its gaze catches your boot and your toes go numb and gray."
+  "paths": [
+   [
+    "The quarry is full of statues. Very lifelike statues, with very surprised faces.",
+    "You polish {shield} to a mirror shine. Old trick.",
+    "You hear it slithering just around the next boulder.",
+    "You fight with your eyes half closed, going by sound alone."
+   ],
+   [
+    "You find the foreman frozen mid-sneeze. You promise him you'll get him out.",
+    "The basilisk's gaze catches {boots}, and your toes go numb and gray.",
+    "You kick up a cloud of quarry dust and charge through it.",
+    "It hisses, and the stone around you starts to crack."
+   ]
   ],
   "win": [
-   "The basilisk sees its own reflection and turns to stone. The quarry workers slowly start to move again."
+   "The basilisk catches its own reflection and turns to stone. One by one, the quarry workers start to move again."
   ],
   "lose": [
-   "You retreat before you end up as a statue. Your left foot stays numb for a day."
+   "You retreat before you become a lawn ornament. Your left foot stays numb for a day."
   ]
  },
  "banditking": {
   "go": [
    "The Bandit King has built a fort at Redcliff and taxes everyone who passes. The duke wants him gone."
   ],
-  "beats": [
-   "You scale the back wall while the guards are arguing about dinner.",
-   "The Bandit King is younger than you expected and very confident.",
-   "His guards rush you from every side. Your {gear} rings with every blow.",
-   "He tells you you're too old for this. You tell him you know.",
-   "You fight across a wooden bridge over the gorge. It creaks a lot."
+  "paths": [
+   [
+    "You scale the back wall while the guards argue about whose turn it is to cook.",
+    "The Bandit King is younger than you expected and very sure of himself.",
+    "His guards rush you from every side, and {armor} rings with every blow.",
+    "He tells you you're too old for this. You tell him you know."
+   ],
+   [
+    "You walk right up to the front gate and knock. They're so surprised, they let you in.",
+    "The duel happens on a rope bridge over the gorge. It creaks every time either of you moves.",
+    "His sword catches {shield}, and the whole bridge sways.",
+    "You remember a trick an old mentor taught you. It still works."
+   ]
   ],
   "win": [
    "The Bandit King surrenders his crown and his fort. The road through Redcliff is free again."
   ],
   "lose": [
-   "You're thrown out of the fort and into a thornbush. The Bandit King's laughter follows you down the hill."
+   "You get thrown out of the fort and into a thornbush. The Bandit King's laughter follows you all the way down the hill."
   ]
  },
  "manor": {
   "go": [
    "Ravensworth Hall has been empty for fifty years. The new owners say it isn't empty at all."
   ],
-  "beats": [
-   "Every portrait's eyes follow you down the hallway.",
-   "A door slams shut behind you. Then all of them do.",
-   "Cold hands brush across your {gear}. You try not to scream.",
-   "The ghost of the old lord appears and demands to know what you're doing in his house.",
-   "You find his old love letters hidden in the wall. That's why he can't rest."
+  "paths": [
+   [
+    "Every portrait's eyes follow you down the main hall.",
+    "A door slams shut behind you. Then every door in the house does.",
+    "Cold hands brush across {armor}. You try very hard not to scream.",
+    "The ghost of the old lord appears and demands to know what you're doing in his house."
+   ],
+   [
+    "The grand piano starts playing by itself. It's badly out of tune.",
+    "Behind the library you find a hidden room, full of love letters he never sent.",
+    "Plates fly off the shelves at you. One shatters on {helm}.",
+    "The ghost finally shows himself. He isn't angry. He's heartbroken."
+   ]
   ],
   "win": [
-   "You read the letters to the ghost, and he finally fades away with a smile. The manor is just a house again."
+   "You read the letters aloud to the ghost, and he finally fades away with a smile. The manor is just a house again."
   ],
   "lose": [
    "The ghost chases you out the front door and slams it behind you. The new owners decide to sell."
@@ -764,51 +931,78 @@ const STORY = {
   "go": [
    "A kraken has moved into the harbor at Port Merrow. No ships have sailed in a week."
   ],
-  "beats": [
-   "You row out with a harpoon and a bad feeling.",
-   "A tentacle bigger than a tree rises out of the water.",
-   "It wraps around the boat and squeezes. Your {gear} creaks under the pressure.",
-   "You end up in the water. The kraken's eye is right there, looking at you.",
-   "Sailors on the docks cheer every time you surface."
+  "paths": [
+   [
+    "You row out with a harpoon and a very bad feeling.",
+    "A tentacle bigger than a tree rises out of the water beside the boat.",
+    "It wraps around the hull and squeezes. {armor} creaks right along with the boards.",
+    "You go into the water. The kraken's eye is right there, as big as a door, looking at you.",
+    "Sailors on the docks cheer every time you come up for air."
+   ],
+   [
+    "The harbor master gives you the one boat nobody will miss.",
+    "The water goes still. Too still.",
+    "The kraken rises right under you and lifts the whole boat into the air.",
+    "A tentacle coils around your arm. You twist free, but only just.",
+    "You find the soft spot behind its eye, the same as the last one you fought."
+   ]
   ],
   "win": [
-   "The kraken lets go and sinks back into the deep. The harbor fills with ships before you've even dried off."
+   "The kraken lets go and sinks back into the deep. Ships are leaving the harbor before you've even dried off."
   ],
   "lose": [
-   "You're hauled out of the water half drowned. The kraken is still there, and so is the blockade."
+   "You're hauled out of the water half drowned. The kraken is still out there, and so is the blockade."
   ]
  },
  "yeti": {
   "go": [
-   "Something huge and white has been raiding supply wagons on Frostpeak Pass."
+   "Something huge and white has been raiding the supply wagons on Frostpeak Pass."
   ],
-  "beats": [
-   "The snow is up to your knees. Then up to your waist.",
-   "You find giant footprints and a trail of half-eaten wagon cargo.",
-   "The yeti roars from the top of a ridge. A little snow starts to slide.",
-   "It swats you into a snowdrift. Your {gear} is caked in ice.",
-   "Your fingers stop working. You fight with your elbows."
+  "paths": [
+   [
+    "The snow is up to your knees. Then up to your waist.",
+    "You find giant footprints and a trail of cracked-open wagon crates.",
+    "The yeti roars from the top of a ridge, and a little snow starts to slide.",
+    "It swats you into a snowdrift. {armor} comes out caked in ice.",
+    "Your fingers stop working. You fight with your elbows."
+   ],
+   [
+    "A wagon driver tells you it only comes out in a blizzard. One is rolling in now.",
+    "You can't see your hand in front of your face. You can hear it breathing, though.",
+    "It grabs {shield} and wrenches it sideways, nearly taking your arm with it.",
+    "You notice it's limping. Someone hurt it before you did.",
+    "You find its den. There's a little one inside."
+   ]
   ],
   "win": [
    "The yeti retreats into the high peaks. The wagon drivers build a bonfire and make you sit closest to it."
   ],
   "lose": [
-   "An avalanche separates you from the yeti. You dig yourself out and limp back down the pass."
+   "An avalanche cuts you off from the yeti. You dig yourself out and limp back down the pass."
   ]
  },
  "lich": {
   "go": [
-   "The Sunken Abbey only rises out of the lake once a year. Something terrible rises with it."
+   "Once a year, the Sunken Abbey rises out of the lake. Something terrible rises with it."
   ],
-  "beats": [
-   "You wade into the abbey as the water drains away. Fish flop on the stone floors.",
-   "Drowned monks shamble out of the pews, still praying.",
-   "The Drowned Lich speaks your name. You never told it your name.",
-   "Dark water swirls around your {gear} and tries to pull you under.",
-   "You find its phylactery hidden in the abbey bell."
+  "paths": [
+   [
+    "You wade in as the water drains away. Fish flop across the stone floors.",
+    "Drowned monks shamble out of the pews, still murmuring their prayers.",
+    "The Drowned Lich speaks your name. You never told it your name.",
+    "Black water coils around {armor} and tries to drag you under.",
+    "You spot its phylactery glowing inside the abbey bell."
+   ],
+   [
+    "The bells start ringing on their own as you step through the doors.",
+    "Every step you take leaves wet footprints that keep walking after you stop.",
+    "The lich raises a hand, and the lake pours back in through the windows.",
+    "You climb the bell tower with the water rising behind you. {boots} slip on every rung.",
+    "The phylactery is right there. So is the lich."
+   ]
   ],
   "win": [
-   "You shatter the phylactery and the lich dissolves into lake water. The abbey sinks back down, quiet at last."
+   "You shatter the phylactery, and the lich dissolves into lake water. The abbey sinks back down, quiet at last."
   ],
   "lose": [
    "The abbey sinks with you still inside. You barely swim out in time. The lich will be back next year."
@@ -816,38 +1010,42 @@ const STORY = {
  },
  "reunion": {
   "go": [
-   "A letter shows up from your old party. One last dungeon, for old times' sake.",
-   "You meet at the gate of Hollowdeep. Everyone is grayer. Everyone is grinning."
+   "A letter arrives from your old party. One last dungeon, for old times' sake.",
+   "You meet at the gates of Hollowdeep. Everyone is grayer. Everyone is grinning."
   ],
-  "beats": [
-   "The wizard forgets half her spells. The half she remembers are still terrifying.",
-   "The thief's knees crack louder than the traps.",
-   "You fall right back into the old formation without saying a word.",
-   "A dragon guards the final hoard. It's older than any of you.",
-   "Its fire washes over the whole party. Your {gear} takes the worst of it.",
-   "You all fight like it's thirty years ago. For a moment, it is."
+  "paths": [
+   [
+    "The wizard forgets half her spells. The half she remembers are still terrifying.",
+    "The thief's knees crack louder than the traps he's disarming.",
+    "You all fall right back into the old formation without a word.",
+    "A dragon guards the final hoard. It's older than any of you.",
+    "Its fire washes over the whole party, and {shield} takes the worst of it."
+   ],
+   [
+    "Your old healer brought snacks. That's new.",
+    "The first trap goes off and everyone dives the wrong way, just like old times.",
+    "You find the room where you all nearly died thirty years ago. Somebody laughs. Then everybody does.",
+    "The dragon wakes up, and the party lines up behind you, like always.",
+    "You charge with {weapon} raised. For a moment, it's thirty years ago."
+   ]
   ],
   "win": [
-   "You split the hoard five ways and toast your old friends. Everyone's retiring after this. Everyone means it this time.",
+   "You split the hoard five ways and raise a toast to old friends. Everyone says they're retiring after this. Everyone means it this time.",
    "The dragon falls. The party laughs until they cry, and then you all go home."
   ],
   "lose": [
-   "The dragon drives you all out of the dungeon. You end up laughing about it anyway, at the tavern, all night."
+   "The dragon drives you all out of the dungeon. You laugh about it anyway, at the tavern, all night long."
   ]
  }
 };
-// Road beats can show up on any adventure
+// Road beats can open a longer adventure (30s+)
 const STORY_ROAD = [
- "Your knee pops on the way up a hill. You pretend it didn't.",
- "A young adventurer recognizes you and asks you to sign their shield.",
- "You stop to stretch. It takes longer than it used to.",
- "You catch yourself thinking about turnips again.",
- "Your {gear} creaks with every step.",
- "A bard on the road is singing a song about you. He gets half the details wrong.",
- "You pass a farm for sale and stare at it a little too long.",
- "It starts raining. Of course it does.",
- "You count your coins in your head. Still not enough. Not yet.",
- "An old tavern sign makes you smile. You got thrown out of there once. Twice, actually."
+ "Your knee clicks on the way up a hill. You pretend it didn't.",
+ "A young adventurer recognizes you on the road and asks you to sign their shield.",
+ "A bard at the crossroads is singing a song about you. He gets half the details wrong, but the chorus is catchy.",
+ "You pass a farm for sale on the way and stare at it a little too long.",
+ "It starts raining an hour into the walk. Of course it does.",
+ "You count your coins in your head on the road. Still not enough. Not yet."
 ];
 const TIER_COLOR = ['var(--r-common)','var(--r-common)','var(--good)','var(--r-rare)','var(--r-rare)','var(--r-epic)','var(--r-legendary)'];
 const TIER_NAME = ['Odd job','Easy','Easy','Medium','Hard','Hard','Deadly'];
@@ -949,7 +1147,7 @@ function newState(){
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const s=JSON.parse(r);if(s&&s.eq)return s}}catch(e){}return null}
-function log(text,kind=''){ S.log.unshift({d:S.day,text,kind}); S.log=S.log.slice(0,400); }
+function log(text,kind='',extra){ const e={d:S.day,text,kind}; if(S.trip&&S.trip.tid){ e.tid=S.trip.tid; e.q=S.trip.key; } if(extra) Object.assign(e,extra); S.log.unshift(e); S.log=S.log.slice(0,400); return e; }
 
 const live = ()=>SLOTS.map(k=>S.eq[k]).filter(g=>g&&g.dur>0);
 function gearPower(g){ if(!g||g.dur<=0) return 0; return g.dur/g.max<.25 ? g.power/2 : g.power; }
@@ -1059,21 +1257,30 @@ function checkMilestones(){
 function buildScript(j){
   const st=STORY[j.key], out=[];
   st.go.slice(1).forEach(t=>out.push({at:.08,t}));
-  const n=clamp(Math.round(j.secs/9),1,st.beats.length);
-  const beats=st.beats.map((t,i)=>({t,i,r:Math.random()})).sort((a,b)=>a.r-b.r).slice(0,n).sort((a,b)=>a.i-b.i).map(b=>b.t); // keep story order
-  if(st.road!==false && Math.random()<.5) beats.unshift(pick(STORY_ROAD)); // road beats happen on the way there
+  const beats=(st.paths?pick(st.paths):st.beats).slice();
+  if(st.road!==false && j.secs>=30 && Math.random()<.3) beats.unshift(pick(STORY_ROAD));
   beats.forEach((t,i)=>out.push({at:.18+(.62*(i+.5)/beats.length),t}));
   return out;
 }
-function storyText(t){ const l=live(); return t.replace(/\{gear\}/g,()=>l.length?pick(l).name:'gear'); }
+const STORY_FALLBACK = {weapon:'your fist',shield:'your forearm',armor:'your bare chest',helm:'your bare head',boots:'your bare feet'};
+function gearRef(g){ const short=g.name.split(',')[0].replace(/ of .*$/,''); return g.name.includes(',')?short:'your '+short; }
+function storyText(t){
+  t=t.replace(/\{(weapon|shield|armor|helm|boots|gear)\}/g,(m,k)=>{
+    if(k==='gear'){ const l=live(); return l.length?gearRef(pick(l)):'your gear'; }
+    const g=S.eq[k]; return g&&g.dur>0?gearRef(g):STORY_FALLBACK[k];
+  });
+  return t.replace(/(^|[.!?]\s+)([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+}
 function resolveTrip(){
   const t=S.trip, j=job(t.key), ok=t.ok!==undefined?t.ok:Math.random()<t.c;
   log(pick(STORY[j.key][ok?'win':'lose']),'story');
   const pr=jobPay(j); let pay=rand(pr[0],pr[1]), wear=jobWear(j);
   if(!ok){ pay=Math.round(pay*.25); wear=Math.round(wear*1.5); }
   S.gold+=pay;
+  const pre=live().map(g=>[g,g.dur]);
   const broke=applyWear(wear);
-  log((ok?'Success at ':'It went badly at ')+j.name+'. Earned '+plain(pay)+'.',ok?'good':'bad');
+  const hit=pre.map(([g,d])=>[g,d-g.dur]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1])[0];
+  log((ok?'Earned ':'Only earned ')+plain(pay)+'.'+(hit?' '+gearRef(hit[0]).replace(/^y/,'Y')+' took the worst of it (−'+hit[1]+').':''),ok?'good':'bad',{res:ok?'win':'lose'});
   sfx(ok?'win':'lose');
   broke.forEach(g=>{ log(g.name+' breaks.','bad'); log(goodbye(g),'story'); });
   if(broke.length) setTimeout(()=>sfx('break'),350);
@@ -1099,7 +1306,8 @@ const A = {
     S.energy=clamp(S.energy-jobEnergy(j),0,maxE());
     S.trip={key, start:Date.now(), dur:j.secs*1000, c, ok:Math.random()<c, script:buildScript(j), next:0};
     S.event=null; S.pendingSell=null;
-    S.trip.beat=STORY[j.key].go[0];
+    S.trip.tid=S.nextId++;
+    S.trip.beat=storyText(STORY[j.key].go[0]);
     log(S.trip.beat,'story'); sfx('setout');
   },
   reroll(){
@@ -1287,8 +1495,21 @@ function renderGear(){
 }
 
 function renderJournal(){
-  let h='', last=null;
-  S.log.forEach(e=>{ if(e.d!==last){ h+='<li class="day">Day '+e.d+'</li>'; last=e.d; } h+='<li class="'+e.kind+'">'+esc(e.text)+'</li>'; });
+  const L=S.log; let h='', last=null, i=0;
+  while(i<L.length){
+    const e=L[i];
+    if(e.d!==last){ h+='<li class="day">Day '+e.d+'</li>'; last=e.d; }
+    if(e.tid){
+      const grp=[]; while(i<L.length && L[i].tid===e.tid){ grp.push(L[i]); i++; }
+      grp.reverse();                     // inside an adventure, read top to bottom
+      const jb=job(e.q), running=S.trip&&S.trip.tid===e.tid, res=grp.find(x=>x.res);
+      const cls=running?'live':res?(res.res==='win'?'won':'lost'):'';
+      h+='<li class="quest '+cls+'"><div class="qh"><b>'+esc(jb?jb.name:'Adventure')+'</b><span>'+(jb?esc(jb.where):'')+'</span><span class="qs">'+(running?'In progress':res?(res.res==='win'?'Success':'Failed'):'')+'</span></div><ol>'+
+        grp.map(x=>'<li class="'+x.kind+'">'+esc(x.text)+'</li>').join('')+'</ol></li>';
+      continue;
+    }
+    h+='<li class="'+e.kind+'">'+esc(e.text)+'</li>'; i++;
+  }
   document.getElementById('log').innerHTML=h;
 }
 
@@ -1451,7 +1672,11 @@ function render(){ if(S&&!S.ended) checkMilestones(); renderTop(); renderGear();
 function tick(){
   if(!S||!S.trip) return;
   const el=Date.now()-S.trip.start, left=Math.max(0,S.trip.dur-el);
-  if(left<=0){ resolveTrip(); save(); render(); return; }
+  if(left<=0){
+    const t=S.trip; if(!t.script){ t.script=buildScript(job(t.key)); t.next=0; }
+    while(t.next<t.script.length){ log(storyText(t.script[t.next].t),'story'); t.next++; } // never skip beats, even if the tab was asleep
+    resolveTrip(); save(); render(); return;
+  }
   const t=S.trip, frac=el/t.dur;
   if(!t.script){ const j=job(t.key); t.script=buildScript(j); t.next=0; if(t.ok===undefined) t.ok=Math.random()<t.c; }
   if(t.script){
