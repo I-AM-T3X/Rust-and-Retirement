@@ -865,10 +865,11 @@ function renderGear(){
   }
   const inj=injuries();
   const stom=S.stomach?'<div class="inj" title="Too many rations today. You\'ll wake up with half your energy."><span><b>Stomach Ache</b><small>half energy tomorrow</small></span></div>':'';
-  h+='<div class="injuries">'+stom+(inj.length
+  const injHTML='<div class="injuries">'+stom+(inj.length
     ? inj.map(i=>'<div class="inj" title="'+esc(i.name+': '+i.desc)+'"><span><b>'+esc(i.name)+'</b><small>'+esc(i.desc.replace(' max energy',' energy'))+'</small></span><button data-a="heal" data-id="'+i.key+'" title="See the healer for '+plain(healCost())+'" '+(!inTown()||S.gold<healCost()?'disabled':'')+'>Heal</button></div>').join('')
     : (stom?'':'<div class="inj-none"><span class="label">Injuries</span><span class="empty-note">None yet</span></div>'))+'</div>';
-  h+='<div class="wxcard" title="Weather changes every morning"><span class="label">'+season().name+'</span><b>'+esc(weather().name)+'</b><span>'+esc(wxNote())+'</span></div>';
+  // separator, then weather, then injuries
+  h+='<div class="conds"><div class="wxcard" title="Weather changes every morning"><span class="label">'+season().name+'</span><b>'+esc(weather().name)+'</b><span>'+esc(wxNote())+'</span></div>'+injHTML+'</div>';
   document.getElementById('gear').innerHTML=h;
 }
 

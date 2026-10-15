@@ -253,6 +253,8 @@ main.cols{display:grid;grid-template-columns:330px minmax(0,1fr) 460px;gap:12px;
   .inj small{font-size:.7rem}
 }
 .phead button{white-space:nowrap}
+.conds{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.conds .wxcard{margin-top:0}
 .wxcard{margin-top:8px;padding:6px 10px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
 .wxcard b{font-size:.86rem}
 .wxcard span:last-child{color:var(--muted);font-size:.78rem}
