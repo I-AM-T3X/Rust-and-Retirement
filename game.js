@@ -576,6 +576,7 @@ function tick(){
   const el=Date.now()-S.trip.start, left=Math.max(0,S.trip.dur-el);
   if(left<=0){ resolveTrip(); save(); render(); return; }
   const t=S.trip, frac=el/t.dur;
+  if(!t.script){ const j=job(t.key); t.script=buildScript(j); t.next=0; if(t.ok===undefined) t.ok=Math.random()<t.c; }
   if(t.script){
     let fired=false;
     while(t.next<t.script.length && frac>=t.script[t.next].at){ t.beat=storyText(t.script[t.next].t); log(t.beat,'story'); t.next++; fired=true; }
