@@ -48,6 +48,131 @@ const JOBS = [
   {key:'wyvern', tier:5,name:'Wyvern Nest',     where:'Gray Cliffs', min:52,secs:48,pay:[32000,46000],wear:26,energy:48,loot:.5, gearDrop:.18,mat:{name:'Wyvern Egg',icon:'egg',v:[9000,15000]},         prefix:'Wyvernbone'},
   {key:'drake',  tier:6,name:'The Ashen Drake', where:'Cinder Peak', min:60,secs:60,pay:[65000,90000],wear:42,energy:60,loot:.6, gearDrop:.25,mat:{name:'Ashen Drake Scale',icon:'scale',v:[18000,28000]}, prefix:'Ashen'}
 ];
+// Story beats shown in the journal during adventures. {gear} becomes a random piece of your equipped gear.
+const STORY = {
+ "docks": {
+  "go": [
+   "You roll up your sleeves at the docks. The foreman points at a mountain of crates."
+  ],
+  "beats": [
+   "A crate of fish slips and you catch it with your knee. Ow.",
+   "The sailors bet on whether the old adventurer can keep up. You keep up.",
+   "Your back makes a noise you've never heard before.",
+   "Somebody's parrot keeps calling you grandpa."
+  ],
+  "win": [
+   "The last crate hits the dock. The foreman nods, which is high praise from him."
+  ],
+  "lose": [
+   "You drop a crate of wine. The foreman takes it out of your pay."
+  ]
+ },
+ "rats": {
+  "go": [
+   "You climb down into a damp cellar in Old Town, torch in hand.",
+   "The innkeeper locks the cellar door behind you. For safety, he says."
+  ],
+  "beats": [
+   "Something squeaks in the dark. Then something else squeaks back.",
+   "A rat the size of a dog lunges at you. Your {gear} takes the bite.",
+   "You find a nest behind the barrels. It's a lot of rats.",
+   "One runs up your leg. You do a little dance nobody needs to see."
+  ],
+  "win": [
+   "The last rat goes down. The cellar is quiet except for your breathing."
+  ],
+  "lose": [
+   "The rats swarm. You scramble up the stairs with your pride in tatters."
+  ]
+ },
+ "goblins": {
+  "go": [
+   "You head into Thornwood. The smoke from the goblin camp isn't hard to find."
+  ],
+  "beats": [
+   "A rock bounces off your {gear}. Then twenty more.",
+   "A goblin in a cooking-pot helmet yells something rude about your age.",
+   "You knock over their stew. They take that personally.",
+   "Their chieftain charges you on a very confused goat."
+  ],
+  "win": [
+   "The goblins scatter into the trees, yelling that this isn't over. It's over."
+  ],
+  "lose": [
+   "There are way more goblins than the bounty said. You retreat, pelted with rocks the whole way."
+  ]
+ },
+ "escort": {
+  "go": [
+   "The caravan rolls out onto the Salt Road. The merchants look nervous."
+  ],
+  "beats": [
+   "Day one passes quietly. Too quietly, says the cook. He says that every day.",
+   "A wagon wheel breaks. You spend an hour holding up a wagon.",
+   "Bandits on the ridge! Arrows thunk into your {gear}.",
+   "The spice merchant tries to haggle your pay down in the middle of the ambush."
+  ],
+  "win": [
+   "The caravan rolls into town with every wagon intact. The merchants are all smiles."
+  ],
+  "lose": [
+   "The bandits make off with two wagons. The merchants pay you, but only barely."
+  ]
+ },
+ "ogre": {
+  "go": [
+   "You reach Millbrook. The miller's cart is upside down in a tree."
+  ],
+  "beats": [
+   "You follow huge footprints and a trail of half-eaten cabbages.",
+   "The ogre is napping on a pile of flour sacks. He wakes up grumpy.",
+   "He swings a whole fence post. Your {gear} takes the hit and groans.",
+   "You find the miller. He's fine, just very annoyed and covered in flour."
+  ],
+  "win": [
+   "The ogre goes down with a thud that rattles every window in Millbrook. The village cheers."
+  ],
+  "lose": [
+   "The ogre tosses you into the millpond. You get the miller out, but the ogre gets away."
+  ]
+ },
+ "wyvern": {
+  "go": [
+   "You start the long climb up the Gray Cliffs. The wind tries to throw you off."
+  ],
+  "beats": [
+   "A shadow passes overhead. Then it circles back.",
+   "The nest is full of eggs, bones, and one very angry parent.",
+   "The wyvern's tail slams into your {gear}. Something cracks.",
+   "You hang off a ledge by one hand. Your knees file a formal complaint."
+  ],
+  "win": [
+   "The wyvern flees into the clouds. You climb down with the loot strapped to your back."
+  ],
+  "lose": [
+   "The wyvern drives you off the cliffs. You slide most of the way down on your backside."
+  ]
+ },
+ "drake": {
+  "go": [
+   "You climb Cinder Peak. The rocks are warm. Then hot.",
+   "Old instincts kick in. This is the kind of job you used to live for."
+  ],
+  "beats": [
+   "The Ashen Drake opens one eye. It remembers you. You remember it.",
+   "Fire rolls over you. The only thing between you and it is your {gear}.",
+   "You land a hit that would've made your younger self proud.",
+   "Its claws rake across your {gear}. The sound is awful.",
+   "Your lungs burn. Your arms burn. Honestly, everything burns."
+  ],
+  "win": [
+   "The Ashen Drake crashes down the mountain. You sit on a rock for a long time, just breathing."
+  ],
+  "lose": [
+   "The drake's fire drives you off the peak. You live, which is more than most can say."
+  ]
+ }
+};
 const TIER_COLOR = ['var(--r-common)','var(--r-common)','var(--good)','var(--r-rare)','var(--r-rare)','var(--r-epic)','var(--r-legendary)'];
 const TIER_NAME = ['Odd job','Easy','Easy','Medium','Hard','Hard','Deadly'];
 const GEAR_BASES = {weapon:['Cleaver','Longsword','Warhammer','Spear'],armor:['Brigandine','Chainmail','Scale Coat'],shield:['Buckler','Tower Shield','Round Shield'],helm:['Sallet','Coif','Great Helm'],boots:['Greaves','Riding Boots','Sabatons']};
@@ -178,8 +303,18 @@ function checkEnd(){
     endGame('Your last piece of gear gave out. Time to hang it all up.');
   }
 }
+function buildScript(j){
+  const st=STORY[j.key], out=[];
+  st.go.slice(1).forEach(t=>out.push({at:.08,t}));
+  const n=clamp(Math.round(j.secs/9),1,st.beats.length);
+  const beats=st.beats.map((t,i)=>({t,i,r:Math.random()})).sort((a,b)=>a.r-b.r).slice(0,n).sort((a,b)=>a.i-b.i).map(b=>b.t); // keep story order
+  beats.forEach((t,i)=>out.push({at:.18+(.62*(i+.5)/n),t}));
+  return out;
+}
+function storyText(t){ const l=live(); return t.replace(/\{gear\}/g,()=>l.length?pick(l).name:'gear'); }
 function resolveTrip(){
-  const t=S.trip, j=job(t.key), ok=Math.random()<t.c;
+  const t=S.trip, j=job(t.key), ok=t.ok!==undefined?t.ok:Math.random()<t.c;
+  log(pick(STORY[j.key][ok?'win':'lose']),'story');
   let pay=rand(j.pay[0],j.pay[1]), wear=j.wear;
   if(!ok){ pay=Math.round(pay*.25); wear=Math.round(wear*1.5); }
   S.gold+=pay;
@@ -203,9 +338,10 @@ const A = {
   job(key){
     const j=job(key), c=chance(j); if(!c||!inTown()||S.phase!=='morning') return;
     S.energy=clamp(S.energy-j.energy,0,100);
-    S.trip={key, start:Date.now(), dur:j.secs*1000, c};
+    S.trip={key, start:Date.now(), dur:j.secs*1000, c, ok:Math.random()<c, script:buildScript(j), next:0};
     S.event=null; S.pendingSell=null;
-    log('You set out for '+j.where+': '+j.name+'.');
+    S.trip.beat=STORY[j.key].go[0];
+    log(S.trip.beat,'story');
   },
   rest(){ if(!inTown()) return; S.energy=clamp(S.energy+CFG.restBonus,0,100); log('You take the day off. Energy +'+CFG.restBonus+'.'); S.phase='evening'; },
   buyRation(n){ n=+n||1; const c=CFG.rationCost*n; if(S.gold<c||S.ended) return; S.gold-=c; S.rations+=n; },
@@ -335,7 +471,7 @@ function renderAdv(){
     body.innerHTML='<div class="trip" style="--tc:'+TIER_COLOR[j.tier]+'"><div class="badge">'+ic(JOB_ICON[j.key])+'</div>'+
       '<div><h3>'+esc(j.name)+'</h3><div style="color:var(--muted)">'+esc(j.where)+' · '+Math.round(S.trip.c*100)+'% odds</div></div>'+
       '<div class="left" id="trip-left">0s</div><div class="bar"><span id="trip-bar" style="width:0%"></span></div>'+
-      '<div style="color:var(--muted);font-size:.85rem">Your gear is out there getting dented. Back soon.</div></div>';
+      '<div class="beat" id="trip-beat">'+esc(S.trip.beat||'Your gear is out there getting dented. Back soon.')+'</div></div>';
     tick(); return;
   }
   if(S.phase==='evening'){
@@ -439,6 +575,12 @@ function tick(){
   if(!S||!S.trip) return;
   const el=Date.now()-S.trip.start, left=Math.max(0,S.trip.dur-el);
   if(left<=0){ resolveTrip(); save(); render(); return; }
+  const t=S.trip, frac=el/t.dur;
+  if(t.script){
+    let fired=false;
+    while(t.next<t.script.length && frac>=t.script[t.next].at){ t.beat=storyText(t.script[t.next].t); log(t.beat,'story'); t.next++; fired=true; }
+    if(fired){ renderJournal(); save(); const bt=document.getElementById('trip-beat'); if(bt) bt.textContent=t.beat; }
+  }
   const b=document.getElementById('trip-bar'), l=document.getElementById('trip-left');
   if(b) b.style.width=(el/S.trip.dur*100)+'%';
   if(l) l.textContent=Math.ceil(left/1000)+'s';

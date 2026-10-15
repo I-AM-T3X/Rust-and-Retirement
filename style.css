@@ -103,6 +103,8 @@ main.cols{display:grid;grid-template-columns:330px minmax(0,1fr) 460px;gap:12px;
 .journal li.good{border-left-color:var(--good);color:var(--ink)}
 .journal li.bad{border-left-color:var(--bad)}
 .journal li.loot{border-left-color:var(--accent);color:var(--ink)}
+.journal li.story{border-left-color:#5a4a86;background:#1f2230;color:#d6d0e8;font-style:italic}
+.trip .beat{color:#d6d0e8;font-style:italic;font-size:.95rem;max-width:42ch;margin:0 auto;min-height:2.8em}
 .journal li.day{background:none;border:none;padding:8px 0 2px;font-family:var(--f-display);font-size:.95rem;color:var(--muted)}
 .journal li.day:first-child{padding-top:0}
 
