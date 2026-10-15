@@ -37,21 +37,21 @@ Your retirement goal is **5000 gold**.
 
 Adventures take real time, from 10 seconds for the easy stuff up to a full minute for the big ones.
 
-| Adventure | Power needed | Time | Pays |
-|-----------|--------------|------|------|
-| Haul Crates | 0 | 10s | 10 to 25g |
-| Cellar Rats | 8 | 15s | 40 to 70g |
-| Goblin Camp | 20 | 22s | 90 to 140g |
-| Caravan Escort | 30 | 30s | 140 to 200g |
-| Ogre Bounty | 42 | 38s | 200 to 300g |
-| Wyvern Nest | 52 | 48s | 320 to 460g |
-| The Ashen Drake | 60 | 60s | 650 to 900g |
+| Adventure | Power needed | Time | Pays | Material drop | Gear drop |
+|-----------|--------------|------|------|---------------|-----------|
+| Haul Crates | 0 | 10s | 2 to 5g | 3% | None |
+| Cellar Rats | 8 | 15s | 8 to 14g | 6% | 1% |
+| Goblin Camp | 20 | 22s | 18 to 28g | 8% | 2% |
+| Caravan Escort | 30 | 30s | 28 to 40g | 10% | 3% |
+| Ogre Bounty | 42 | 38s | 40 to 60g | 12% | 4% |
+| Wyvern Nest | 52 | 48s | 64 to 92g | 14% | 5% |
+| The Ashen Drake | 60 | 60s | 130 to 180g | 18% | 7% |
 
 Each morning the board shows 6 adventures: Haul Crates plus five random ones. A failed adventure pays only 25% and wears your gear down 50% more.
 
 ## Loot
 
-Adventures can bring stuff back:
+Loot is rare. Adventures can sometimes bring stuff back (see the drop chances in the table above):
 
 - **Materials** like rat pelts, ogre tusks, and drake scales. These are just for selling. Tougher adventures drop more valuable materials.
 - **Gear** from tougher adventures. It comes in Common, Rare, Epic, and Legendary. You can equip it to replace a broken or weaker piece, or sell it. A green arrow in your bag means the item is stronger than what you have equipped.

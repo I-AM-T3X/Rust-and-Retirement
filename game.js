@@ -40,13 +40,13 @@ const RARITY = {
 };
 // secs = how long the adventure takes. loot = chance of materials, gearDrop = chance of a gear piece (on success)
 const JOBS = [
-  {key:'docks',  tier:0,name:'Haul Crates',     where:'The docks',   min:0, secs:10,pay:[1000,2500],  wear:1, energy:20,loot:.15,gearDrop:0,  mat:{name:'Crate of Salted Fish',icon:'crate',v:[300,600]},   prefix:''},
-  {key:'rats',   tier:1,name:'Cellar Rats',     where:'Old Town',    min:8, secs:15,pay:[4000,7000],  wear:5, energy:20,loot:.35,gearDrop:.05,mat:{name:'Bundle of Rat Pelts',icon:'pelt',v:[800,1500]},    prefix:'Cellar-Found'},
-  {key:'goblins',tier:2,name:'Goblin Camp',     where:'Thornwood',   min:20,secs:22,pay:[9000,14000], wear:10,energy:28,loot:.4, gearDrop:.1, mat:{name:'Goblin Trinkets',icon:'trinket',v:[1500,3000]},    prefix:'Goblin-Made'},
-  {key:'escort', tier:3,name:'Caravan Escort',  where:'Salt Road',   min:30,secs:30,pay:[14000,20000],wear:13,energy:35,loot:.4, gearDrop:.12,mat:{name:'Spice Sachet',icon:'sachet',v:[3000,5000]},      prefix:'Caravan Guard\'s'},
-  {key:'ogre',   tier:4,name:'Ogre Bounty',     where:'Millbrook',   min:42,secs:38,pay:[20000,30000],wear:18,energy:40,loot:.45,gearDrop:.15,mat:{name:'Ogre Tusk',icon:'tusk',v:[5000,8000]},          prefix:'Ogre-Hide'},
-  {key:'wyvern', tier:5,name:'Wyvern Nest',     where:'Gray Cliffs', min:52,secs:48,pay:[32000,46000],wear:26,energy:48,loot:.5, gearDrop:.18,mat:{name:'Wyvern Egg',icon:'egg',v:[9000,15000]},         prefix:'Wyvernbone'},
-  {key:'drake',  tier:6,name:'The Ashen Drake', where:'Cinder Peak', min:60,secs:60,pay:[65000,90000],wear:42,energy:60,loot:.6, gearDrop:.25,mat:{name:'Ashen Drake Scale',icon:'scale',v:[18000,28000]}, prefix:'Ashen'}
+  {key:'docks',  tier:0,name:'Haul Crates',     where:'The docks',   min:0, secs:10,pay:[200,500],  wear:1, energy:20,loot:0.03,gearDrop:0,  mat:{name:'Crate of Salted Fish',icon:'crate',v:[300,600]},   prefix:''},
+  {key:'rats',   tier:1,name:'Cellar Rats',     where:'Old Town',    min:8, secs:15,pay:[800,1400],  wear:5, energy:20,loot:0.06,gearDrop:0.01,mat:{name:'Bundle of Rat Pelts',icon:'pelt',v:[800,1500]},    prefix:'Cellar-Found'},
+  {key:'goblins',tier:2,name:'Goblin Camp',     where:'Thornwood',   min:20,secs:22,pay:[1800,2800], wear:10,energy:28,loot:0.08, gearDrop:0.02, mat:{name:'Goblin Trinkets',icon:'trinket',v:[1500,3000]},    prefix:'Goblin-Made'},
+  {key:'escort', tier:3,name:'Caravan Escort',  where:'Salt Road',   min:30,secs:30,pay:[2800,4000],wear:13,energy:35,loot:0.1, gearDrop:0.03,mat:{name:'Spice Sachet',icon:'sachet',v:[3000,5000]},      prefix:'Caravan Guard\'s'},
+  {key:'ogre',   tier:4,name:'Ogre Bounty',     where:'Millbrook',   min:42,secs:38,pay:[4000,6000],wear:18,energy:40,loot:0.12,gearDrop:0.04,mat:{name:'Ogre Tusk',icon:'tusk',v:[5000,8000]},          prefix:'Ogre-Hide'},
+  {key:'wyvern', tier:5,name:'Wyvern Nest',     where:'Gray Cliffs', min:52,secs:48,pay:[6400,9200],wear:26,energy:48,loot:0.14, gearDrop:0.05,mat:{name:'Wyvern Egg',icon:'egg',v:[9000,15000]},         prefix:'Wyvernbone'},
+  {key:'drake',  tier:6,name:'The Ashen Drake', where:'Cinder Peak', min:60,secs:60,pay:[13000,18000],wear:42,energy:60,loot:0.18, gearDrop:0.07,mat:{name:'Ashen Drake Scale',icon:'scale',v:[18000,28000]}, prefix:'Ashen'}
 ];
 // Story beats shown in the journal during adventures. {gear} becomes a random piece of your equipped gear.
 const STORY = {
