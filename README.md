@@ -184,9 +184,14 @@ No build step and no dependencies. Just keep these files in the same folder:
 index.html
 style.css
 game.js
+embed.png
 ```
 
 Open `index.html` in a browser, or push the folder to GitHub Pages.
+
+### Link preview
+
+When the link is shared on Discord, X, or anywhere else, it shows a preview card using `embed.png` (1200×630). To use your own art, replace `embed.png` with a new 1200×630 image with the same name. The preview tags in `index.html` point to `https://i-am-t3x.github.io/Rust-and-Retirement/`, so update them if the repo name changes. Discord and X cache previews, so a new image can take a little while to show up.
 
 Your progress saves automatically in your browser, including adventures in progress. You can close the tab mid-adventure and pick up where you left off.
 
