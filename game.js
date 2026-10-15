@@ -10,6 +10,7 @@ const CFG = {
   bagSize: 18,
   rerollBase: 50,      // first board reroll each day costs 5 silver
   rerollGrowth: 2,     // each reroll after that costs 2x the last; resets every morning
+  wearMult: .6,        // gear wear from quests (1 = full wear, .6 = 40% less)
   safeRations: 3,      // eat more than this many rations in one day and you risk a stomach ache
   fatigueRisk: .05,    // each extra quest in one day adds 5% injury risk
   healCost: 2000,     // the healer charges 20g to treat one injury (rises with prices)
@@ -49,7 +50,7 @@ const RARITY = {
 const INJURIES = [
   {key:'knee',name:'Bad Knee',desc:'-10 max energy',energy:-10,power:0,line:"Your knee twists the wrong way. It's never going to be quite right again."},
   {key:'back',name:'Thrown-Out Back',desc:'-8 max energy',energy:-8,power:0,line:"Something in your back goes pop. You walk home bent like a question mark."},
-  {key:'ribs',name:'Cracked Ribs',desc:'-6 max energy, -1 power',energy:-6,power:-1,line:"You feel a rib crack. Breathing is a whole project now."},
+  {key:'ribs',name:'Cracked Ribs',desc:'-6 max energy -1 power',energy:-6,power:-1,line:"You feel a rib crack. Breathing is a whole project now."},
   {key:'shoulder',name:'Stiff Shoulder',desc:'-3 power',energy:0,power:-3,line:"Your sword arm won't lift past your ear anymore."},
   {key:'hand',name:'Shaky Hand',desc:'-2 power',energy:0,power:-2,line:"Your grip trembles now. You hope nobody noticed."},
   {key:'ear',name:'Ringing Ear',desc:'-2 power',energy:0,power:-2,line:"Your left ear won't stop ringing. You'll never hear the next ambush coming."}
@@ -108,7 +109,27 @@ const JOBS = [
   {key:"necro",tier:5,name:"The Hedge Necromancer",where:"Blackmoor",min:54,secs:50,pay:[6800,9600],wear:27,energy:50,loot:0.14,gearDrop:0.05,mat:{name:"Cursed Grimoire",icon:"skull",v:[10000,16000]},prefix:"Bone-Carved"},
   {key:"giant",tier:5,name:"Hill Giant's Toll",where:"The Highpass",min:56,secs:52,pay:[7200,10000],wear:30,energy:52,loot:0.15,gearDrop:0.05,mat:{name:"Giant's Toe Ring",icon:"gem",v:[11000,17000]},prefix:"Giantsteel"},
   {key:"rival",tier:6,name:"Old Rival's Last Duel",where:"Dunmore Arena",min:58,secs:58,pay:[12000,17000],wear:38,energy:55,loot:0.18,gearDrop:0.07,mat:{name:"Rival's Champion Medal",icon:"medal",v:[15000,25000]},prefix:"Rival's"},
-  {key:"drake",tier:6,name:"The Ashen Drake",where:"Cinder Peak",min:60,secs:60,pay:[13000,18000],wear:42,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ashen Drake Scale",icon:"scale",v:[18000,28000]},prefix:"Ashen"}
+  {key:"drake",tier:6,name:"The Ashen Drake",where:"Cinder Peak",min:60,secs:60,pay:[13000,18000],wear:42,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ashen Drake Scale",icon:"scale",v:[18000,28000]},prefix:"Ashen"},
+  {key:"mail",tier:0,name:"Deliver the Post",where:"Willowmere Road",min:0,secs:11,pay:[250,550],wear:1,energy:18,loot:0.04,gearDrop:0,mat:{name:"Lost Love Letter",icon:"scroll",v:[300,700]},prefix:""},
+  {key:"sheep",tier:0,name:"Sheep Shearing",where:"Brambleton",min:0,secs:13,pay:[300,650],wear:2,energy:22,loot:0.05,gearDrop:0,mat:{name:"Bale of Wool",icon:"pelt",v:[400,800]},prefix:""},
+  {key:"bees",tier:1,name:"Angry Beehive",where:"Honeyvale Orchard",min:6,secs:14,pay:[700,1200],wear:3,energy:20,loot:0.06,gearDrop:0.01,mat:{name:"Jar of Wild Honey",icon:"bottle",v:[700,1300]},prefix:"Beekeeper's"},
+  {key:"pumpkin",tier:1,name:"Giant Pumpkin Haul",where:"Gourdfield",min:7,secs:16,pay:[800,1300],wear:4,energy:26,loot:0.06,gearDrop:0.01,mat:{name:"Prize Pumpkin Seeds",icon:"herb",v:[700,1200]},prefix:"Farmhand's"},
+  {key:"spiders",tier:1,name:"Spider Nest",where:"Old Mill Loft",min:10,secs:17,pay:[900,1500],wear:6,energy:22,loot:0.07,gearDrop:0.01,mat:{name:"Spool of Spider Silk",icon:"web",v:[1000,1800]},prefix:"Silkspun"},
+  {key:"tavern",tier:1,name:"Tavern Bouncer",where:"The Rusty Flagon",min:11,secs:16,pay:[900,1400],wear:5,energy:24,loot:0.07,gearDrop:0.01,mat:{name:"Lost Coin Purse",icon:"coin",v:[900,1600]},prefix:"Bouncer's"},
+  {key:"kobolds",tier:2,name:"Kobold Tunnels",where:"Clayhill",min:18,secs:22,pay:[1700,2600],wear:9,energy:28,loot:0.08,gearDrop:0.02,mat:{name:"Chunk of Raw Amber",icon:"gem",v:[1500,2800]},prefix:"Kobold-Forged"},
+  {key:"smugglers",tier:2,name:"Smugglers' Cove",where:"Saltmarsh",min:22,secs:24,pay:[1900,2900],wear:10,energy:30,loot:0.08,gearDrop:0.02,mat:{name:"Smuggled Brandy",icon:"bottle",v:[2000,3200]},prefix:"Smuggler's"},
+  {key:"scarecrow",tier:2,name:"The Walking Scarecrow",where:"Harrow Fields",min:22,secs:24,pay:[1900,2800],wear:10,energy:28,loot:0.08,gearDrop:0.02,mat:{name:"Enchanted Straw",icon:"herb",v:[1800,3000]},prefix:"Harrowed"},
+  {key:"boar",tier:2,name:"Great Tusked Boar",where:"Oakhollow Woods",min:26,secs:26,pay:[2100,3100],wear:12,energy:32,loot:0.09,gearDrop:0.02,mat:{name:"Boar Tusk",icon:"tusk",v:[2000,3500]},prefix:"Boarhide"},
+  {key:"witch",tier:3,name:"The Bog Witch's Bargain",where:"Murkwater",min:32,secs:32,pay:[3000,4300],wear:14,energy:35,loot:0.1,gearDrop:0.03,mat:{name:"Witch's Potion",icon:"bottle",v:[3500,5500]},prefix:"Hexwoven"},
+  {key:"lighthouse",tier:3,name:"Lighthouse Siege",where:"Gull Point",min:35,secs:34,pay:[3200,4600],wear:16,energy:36,loot:0.1,gearDrop:0.03,mat:{name:"Black Pearl",icon:"gem",v:[3500,6000]},prefix:"Tidecaller's"},
+  {key:"tourney",tier:3,name:"Village Tourney",where:"Kingsbridge Green",min:36,secs:32,pay:[3200,4500],wear:15,energy:34,loot:0.1,gearDrop:0.03,mat:{name:"Tourney Ribbon",icon:"medal",v:[3000,5000]},prefix:"Champion's"},
+  {key:"basilisk",tier:4,name:"Basilisk Den",where:"Stonefall Quarry",min:44,secs:40,pay:[4200,6200],wear:20,energy:42,loot:0.12,gearDrop:0.04,mat:{name:"Basilisk Eye",icon:"gem",v:[5500,8500]},prefix:"Stoneguard"},
+  {key:"banditking",tier:4,name:"Bandit King's Fort",where:"Redcliff",min:46,secs:42,pay:[4400,6600],wear:21,energy:44,loot:0.12,gearDrop:0.04,mat:{name:"Bandit King's Signet",icon:"trinket",v:[6000,9000]},prefix:"Bandit King's"},
+  {key:"manor",tier:4,name:"Haunted Manor",where:"Ravensworth Hall",min:48,secs:42,pay:[4600,6800],wear:20,energy:44,loot:0.12,gearDrop:0.04,mat:{name:"Spectral Locket",icon:"trinket",v:[6000,9500]},prefix:"Ghostly"},
+  {key:"kraken",tier:5,name:"Kraken in the Harbor",where:"Port Merrow",min:55,secs:52,pay:[7000,9800],wear:28,energy:50,loot:0.14,gearDrop:0.05,mat:{name:"Barrel of Kraken Ink",icon:"bottle",v:[10000,16000]},prefix:"Krakenhide"},
+  {key:"yeti",tier:5,name:"The Frostpeak Yeti",where:"Frostpeak Pass",min:56,secs:54,pay:[7400,10200],wear:30,energy:54,loot:0.15,gearDrop:0.05,mat:{name:"Yeti Fur",icon:"pelt",v:[11000,17000]},prefix:"Frostbound"},
+  {key:"lich",tier:6,name:"The Drowned Lich",where:"Sunken Abbey",min:59,secs:58,pay:[12500,17500],wear:40,energy:56,loot:0.18,gearDrop:0.07,mat:{name:"Lich's Phylactery Shard",icon:"skull",v:[16000,26000]},prefix:"Lichbane"},
+  {key:"reunion",tier:6,name:"One Last Dungeon",where:"Hollowdeep",min:60,secs:60,pay:[13500,19000],wear:44,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ancient Crown",icon:"medal",v:[19000,29000]},prefix:"Hero's"}
 ];
 // Story beats shown in the journal during adventures. {gear} becomes a random piece of your equipped gear.
 const STORY = {
@@ -447,6 +468,372 @@ const STORY = {
   "lose": [
    "The drake's fire drives you off the peak. You live, which is more than most can say."
   ]
+ },
+ "mail": {
+  "go": [
+   "The postmaster hands you a sack of letters and a map with half the roads crossed out."
+  ],
+  "beats": [
+   "A dog chases you down the lane. You haven't run this fast since the goblin wars.",
+   "Old Widow Pell invites you in for tea. You can't say no to Widow Pell.",
+   "One letter is addressed to you. It's a bill from twenty years ago.",
+   "Your {gear} snags on a mailbox. The mailbox wins.",
+   "A farmer asks you to read his letter aloud. It's from his mother. You both get a little misty."
+  ],
+  "win": [
+   "Every letter delivered. The postmaster says you're the fastest carrier he's had all year. He's had two."
+  ],
+  "lose": [
+   "You drop the sack in a creek. Half the village is getting soggy mail this week."
+  ]
+ },
+ "sheep": {
+  "road": false,
+  "go": [
+   "The farmers at Brambleton need help shearing. The sheep do not want to be sheared."
+  ],
+  "beats": [
+   "The first sheep kicks you square in the chest. You respect it.",
+   "You pin a ram down. It looks at you like you owe it money.",
+   "There is wool in places wool should never be.",
+   "A lamb follows you around all morning. You try not to get attached.",
+   "You catch yourself pricing out sheep for your own farm. Two, maybe three."
+  ],
+  "win": [
+   "You've sheared the whole flock. The sheep look naked and furious. The farmers look delighted."
+  ],
+  "lose": [
+   "The flock breaks through the fence and scatters across three fields. The farmers sigh and pay you anyway."
+  ]
+ },
+ "bees": {
+  "go": [
+   "The orchard keeper at Honeyvale says the bees have gone wild and nobody can reach the apples."
+  ],
+  "beats": [
+   "The hive is the size of a wagon. The buzzing is the size of a war.",
+   "A bee gets inside your {gear}. Then a few more.",
+   "You light a smoke pot. The bees get sleepy. So do you.",
+   "You get stung on the nose. It swells up like a turnip.",
+   "The queen bee is enormous and clearly in charge."
+  ],
+  "win": [
+   "The bees calm down and settle into a new hive box. The keeper gives you a jar of honey on top of your pay."
+  ],
+  "lose": [
+   "You run for the river with half the hive behind you. You come out puffy but alive."
+  ]
+ },
+ "pumpkin": {
+  "road": false,
+  "go": [
+   "The farmers at Gourdfield grew a pumpkin the size of a cart. They need someone strong to haul it to the fair."
+  ],
+  "beats": [
+   "You try to lift it. It does not move. You try again with your legs.",
+   "Three farmers push, you pull, and the pumpkin finally rolls onto the cart.",
+   "The cart axle groans. Your {gear} groans. You groan.",
+   "A crow lands on top of the pumpkin and refuses to leave.",
+   "You can't help thinking about what you'd grow on your own farm."
+  ],
+  "win": [
+   "The pumpkin wins first prize at the fair. The farmers carry you around on their shoulders for a minute."
+  ],
+  "lose": [
+   "The pumpkin rolls off the cart and down a hill. You chase it all the way to the river. It floats."
+  ]
+ },
+ "spiders": {
+  "go": [
+   "The miller says something's been living in the old loft. Something with a lot of legs."
+  ],
+  "beats": [
+   "Webs hang from every beam, thick as curtains.",
+   "You hear tiny feet skittering above you. Then big feet.",
+   "A spider the size of a dog drops down in front of your face.",
+   "Webbing sticks to your {gear}. You'll be picking it off for weeks.",
+   "You find a whole cocoon of stolen flour sacks. The miller will be thrilled."
+  ],
+  "win": [
+   "The nest is cleared out and the loft is quiet. The miller says he'll finally sleep tonight."
+  ],
+  "lose": [
+   "You get so tangled in web that the miller has to cut you loose with a bread knife."
+  ]
+ },
+ "tavern": {
+  "go": [
+   "The Rusty Flagon needs a bouncer for the night. A caravan of sailors just came in."
+  ],
+  "beats": [
+   "The first fight breaks out before you've even sat down.",
+   "A sailor swings a chair at you. Your {gear} takes most of it.",
+   "You toss two brawlers out the door. Then they come back in through the window.",
+   "The bard keeps playing like nothing's happening. Respect.",
+   "Someone recognizes you from the old days and buys a round for the whole room. The fighting stops for exactly one song."
+  ],
+  "win": [
+   "By closing time, the tavern is still mostly standing. The owner calls that a win and pays you double."
+  ],
+  "lose": [
+   "The brawl spills into the street and takes out the front window. The owner pays you, but he's not happy."
+  ]
+ },
+ "kobolds": {
+  "go": [
+   "Kobolds have dug tunnels all under Clayhill and the houses are starting to sink."
+  ],
+  "beats": [
+   "The tunnels are kobold sized. You are not kobold sized.",
+   "Tiny traps go off all around you. Most of them miss.",
+   "A kobold yells something at you and his friends laugh.",
+   "A cave-in drops dirt all over your {gear}.",
+   "You find their boss sitting on a throne made of stolen spoons."
+  ],
+  "win": [
+   "The kobolds pack up and move to a different hill. Clayhill throws you a small but heartfelt party."
+  ],
+  "lose": [
+   "You crawl out of a collapsed tunnel covered in clay from head to toe. The kobolds are still there."
+  ]
+ },
+ "smugglers": {
+  "go": [
+   "The harbor guard at Saltmarsh suspects smugglers are using an old sea cave. They want someone to check it out quietly."
+  ],
+  "beats": [
+   "You wade in at low tide. The water is very cold and very fast.",
+   "You hear voices and barrels rolling across stone.",
+   "A smuggler spots you and blows a whistle. So much for quiet.",
+   "A cutlass bounces off your {gear}. Close one.",
+   "The smuggler captain offers you a cut of the profits. It's tempting. It's very tempting."
+  ],
+  "win": [
+   "The smugglers are rounded up and the harbor guard seizes the whole stash. They let you keep a bottle of brandy."
+  ],
+  "lose": [
+   "The tide comes in and you have to swim out empty-handed. The smugglers wave goodbye from their boat."
+  ]
+ },
+ "scarecrow": {
+  "road": false,
+  "go": [
+   "The farmers at Harrow Fields swear their scarecrow has been walking around at night."
+  ],
+  "beats": [
+   "The scarecrow is gone from its post. There are straw footprints leading into the corn.",
+   "Crows circle overhead, cawing like they're trying to warn you.",
+   "The scarecrow steps out of the corn and tilts its head at you.",
+   "It hits a lot harder than straw should. Your {gear} takes the blow.",
+   "You find a hedge witch's charm stitched into its coat."
+  ],
+  "win": [
+   "You pull out the charm and the scarecrow slumps over, just straw again. The farmers put it back on its post, a little nervously."
+  ],
+  "lose": [
+   "The scarecrow chases you all the way out of the cornfield. The farmers decide to leave it alone."
+  ]
+ },
+ "boar": {
+  "go": [
+   "A boar the size of a horse has been tearing up Oakhollow Woods. The hunters won't go near it."
+  ],
+  "beats": [
+   "You follow a trail of uprooted trees. That's a big boar.",
+   "It charges out of the brush faster than anything that big should move.",
+   "Its tusks slam into your {gear} and lift you off your feet.",
+   "You climb a tree to catch your breath. Your knees hate you.",
+   "The boar circles the tree, snorting and waiting."
+  ],
+  "win": [
+   "The great boar finally goes down. The hunters spend the whole night telling the story, and it gets bigger every time."
+  ],
+  "lose": [
+   "The boar chases you clear out of the woods. You decide that's the boar's forest now."
+  ]
+ },
+ "witch": {
+  "go": [
+   "The Bog Witch of Murkwater has been cursing travelers. The town wants her gone. Or at least, quieter."
+  ],
+  "beats": [
+   "Her hut stands on chicken legs. It turns to look at you.",
+   "She offers you a deal. You can't tell if she's joking.",
+   "A curse hits your {gear} and it goes cold as ice.",
+   "Her cauldron bubbles over and the whole bog smells like boiled socks.",
+   "She asks about your plans. You tell her about the farm. She gets quiet."
+  ],
+  "win": [
+   "You and the witch strike a bargain. She'll leave travelers alone, and you'll send her a basket of vegetables every harvest."
+  ],
+  "lose": [
+   "She turns your hair green and sends you packing. It washes out after a few days. Mostly."
+  ]
+ },
+ "lighthouse": {
+  "go": [
+   "Something has been climbing out of the sea and attacking the lighthouse at Gull Point."
+  ],
+  "beats": [
+   "The keeper is barricaded at the top. He waves at you, then points down.",
+   "Crab men scuttle up the rocks, clacking their claws.",
+   "A wave crashes over you and nearly washes you off the cliff.",
+   "A claw clamps down on your {gear}. It takes three tries to shake it off.",
+   "The lighthouse lamp goes dark. You fight in the moonlight."
+  ],
+  "win": [
+   "The last crab man drops into the sea and the lamp flickers back on. Ships in the harbor ring their bells for you."
+  ],
+  "lose": [
+   "You hold them off long enough for the keeper to escape, but the crab men take the lighthouse."
+  ]
+ },
+ "tourney": {
+  "go": [
+   "Kingsbridge is holding its village tourney, and the prize money is real. The other fighters are a third your age."
+  ],
+  "beats": [
+   "A young knight laughs when he sees you sign up. You remember his face.",
+   "Your first opponent goes down in two swings. The crowd starts paying attention.",
+   "The joust is rough. A lance cracks against your {gear}.",
+   "Between rounds, a kid asks if you're a real adventurer. You say you used to be.",
+   "The final match is against the knight who laughed. You stop being polite."
+  ],
+  "win": [
+   "You win the whole tourney. The young knight shakes your hand and asks for tips. You give him one."
+  ],
+  "lose": [
+   "You lose in the final, but the crowd is chanting your name as you leave the field."
+  ]
+ },
+ "basilisk": {
+  "go": [
+   "Workers keep turning to stone at Stonefall Quarry. Everyone knows what that means."
+  ],
+  "beats": [
+   "The quarry is full of statues. Very lifelike statues.",
+   "You polish your {gear} to a mirror shine. Old trick.",
+   "You hear it slithering just around the corner.",
+   "You fight with your eyes half closed, going by sound alone.",
+   "Its gaze catches your boot and your toes go numb and gray."
+  ],
+  "win": [
+   "The basilisk sees its own reflection and turns to stone. The quarry workers slowly start to move again."
+  ],
+  "lose": [
+   "You retreat before you end up as a statue. Your left foot stays numb for a day."
+  ]
+ },
+ "banditking": {
+  "go": [
+   "The Bandit King has built a fort at Redcliff and taxes everyone who passes. The duke wants him gone."
+  ],
+  "beats": [
+   "You scale the back wall while the guards are arguing about dinner.",
+   "The Bandit King is younger than you expected and very confident.",
+   "His guards rush you from every side. Your {gear} rings with every blow.",
+   "He tells you you're too old for this. You tell him you know.",
+   "You fight across a wooden bridge over the gorge. It creaks a lot."
+  ],
+  "win": [
+   "The Bandit King surrenders his crown and his fort. The road through Redcliff is free again."
+  ],
+  "lose": [
+   "You're thrown out of the fort and into a thornbush. The Bandit King's laughter follows you down the hill."
+  ]
+ },
+ "manor": {
+  "go": [
+   "Ravensworth Hall has been empty for fifty years. The new owners say it isn't empty at all."
+  ],
+  "beats": [
+   "Every portrait's eyes follow you down the hallway.",
+   "A door slams shut behind you. Then all of them do.",
+   "Cold hands brush across your {gear}. You try not to scream.",
+   "The ghost of the old lord appears and demands to know what you're doing in his house.",
+   "You find his old love letters hidden in the wall. That's why he can't rest."
+  ],
+  "win": [
+   "You read the letters to the ghost, and he finally fades away with a smile. The manor is just a house again."
+  ],
+  "lose": [
+   "The ghost chases you out the front door and slams it behind you. The new owners decide to sell."
+  ]
+ },
+ "kraken": {
+  "go": [
+   "A kraken has moved into the harbor at Port Merrow. No ships have sailed in a week."
+  ],
+  "beats": [
+   "You row out with a harpoon and a bad feeling.",
+   "A tentacle bigger than a tree rises out of the water.",
+   "It wraps around the boat and squeezes. Your {gear} creaks under the pressure.",
+   "You end up in the water. The kraken's eye is right there, looking at you.",
+   "Sailors on the docks cheer every time you surface."
+  ],
+  "win": [
+   "The kraken lets go and sinks back into the deep. The harbor fills with ships before you've even dried off."
+  ],
+  "lose": [
+   "You're hauled out of the water half drowned. The kraken is still there, and so is the blockade."
+  ]
+ },
+ "yeti": {
+  "go": [
+   "Something huge and white has been raiding supply wagons on Frostpeak Pass."
+  ],
+  "beats": [
+   "The snow is up to your knees. Then up to your waist.",
+   "You find giant footprints and a trail of half-eaten wagon cargo.",
+   "The yeti roars from the top of a ridge. A little snow starts to slide.",
+   "It swats you into a snowdrift. Your {gear} is caked in ice.",
+   "Your fingers stop working. You fight with your elbows."
+  ],
+  "win": [
+   "The yeti retreats into the high peaks. The wagon drivers build a bonfire and make you sit closest to it."
+  ],
+  "lose": [
+   "An avalanche separates you from the yeti. You dig yourself out and limp back down the pass."
+  ]
+ },
+ "lich": {
+  "go": [
+   "The Sunken Abbey only rises out of the lake once a year. Something terrible rises with it."
+  ],
+  "beats": [
+   "You wade into the abbey as the water drains away. Fish flop on the stone floors.",
+   "Drowned monks shamble out of the pews, still praying.",
+   "The Drowned Lich speaks your name. You never told it your name.",
+   "Dark water swirls around your {gear} and tries to pull you under.",
+   "You find its phylactery hidden in the abbey bell."
+  ],
+  "win": [
+   "You shatter the phylactery and the lich dissolves into lake water. The abbey sinks back down, quiet at last."
+  ],
+  "lose": [
+   "The abbey sinks with you still inside. You barely swim out in time. The lich will be back next year."
+  ]
+ },
+ "reunion": {
+  "go": [
+   "A letter shows up from your old party. One last dungeon, for old times' sake.",
+   "You meet at the gate of Hollowdeep. Everyone is grayer. Everyone is grinning."
+  ],
+  "beats": [
+   "The wizard forgets half her spells. The half she remembers are still terrifying.",
+   "The thief's knees crack louder than the traps.",
+   "You fall right back into the old formation without saying a word.",
+   "A dragon guards the final hoard. It's older than any of you.",
+   "Its fire washes over the whole party. Your {gear} takes the worst of it.",
+   "You all fight like it's thirty years ago. For a moment, it is."
+  ],
+  "win": [
+   "You split the hoard five ways and toast your old friends. Everyone's retiring after this. Everyone means it this time.",
+   "The dragon falls. The party laughs until they cry, and then you all go home."
+  ],
+  "lose": [
+   "The dragon drives you all out of the dungeon. You end up laughing about it anyway, at the tavern, all night."
+  ]
  }
 };
 // Road beats can show up on any adventure
@@ -511,9 +898,12 @@ const ICON = {
   horn:'<path d="M4 20c2-8 7-13 16-16-3 5-4 10-10 13z"/><path d="M8 16l2 2M11 13l2 2"/>',
   skull:'<path d="M5 11a7 7 0 0114 0v4h-2v4H7v-4H5z"/><circle cx="9.5" cy="11.5" r="1.5"/><circle cx="14.5" cy="11.5" r="1.5"/>',
   medal:'<circle cx="12" cy="15" r="5"/><path d="M8 3l4 7 4-7M12 13v4"/>',
+  scroll:'<path d="M7 4h11v13a3 3 0 01-3 3H6a3 3 0 010-6h1z"/><path d="M7 14V4M10 8h5M10 11h5"/>',
+  bottle:'<path d="M10 3h4M10 3v4l-3 4v8a2 2 0 002 2h6a2 2 0 002-2v-8l-3-4V3"/><path d="M7 14h10"/>',
+  web:'<path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="7.5"/>',
   clock:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>'
 };
-const JOB_ICON = {docks:"crate",herbs:"herb",rooster:"feather",rats:"pelt",wolves:"pelt",goblins:"trinket",crypt:"gem",escort:"sachet",bridge:"trinket",mine:"gem",ogre:"tusk",troll:"horn",wyvern:"egg",necro:"skull",giant:"gem",rival:"medal",drake:"scale"};
+const JOB_ICON = Object.fromEntries(JOBS.map(j=>[j.key,j.mat.icon]));
 const ic = (k,cls='')=>'<svg class="ico '+cls+'" viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>';
 
 // ---------- helpers ----------
@@ -542,7 +932,7 @@ const healCost = ()=>upkeep(CFG.healCost);
 const injuries = ()=>(S.injuries||[]).map(k=>INJURIES.find(i=>i.key===k)).filter(Boolean);
 const maxE = ()=>Math.max(40,100+injuries().reduce((a,i)=>a+i.energy,0));
 const jobEnergy = j=>Math.round(j.energy*wx().energy);
-const jobWear = j=>Math.round(j.wear*wx().wear);
+const jobWear = j=>Math.max(1,Math.round(j.wear*CFG.wearMult*wx().wear));
 const jobPay = j=>[Math.round(j.pay[0]*wx().pay),Math.round(j.pay[1]*wx().pay)];
 function rollMarket(){ S.market={}; JOBS.forEach(j=>{ S.market[j.mat.name]=Math.round((.6+Math.random()*.9)*100)/100; }); }
 const marketMult = n=>(S.market&&S.market[n])||1;
@@ -559,7 +949,7 @@ function newState(){
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const s=JSON.parse(r);if(s&&s.eq)return s}}catch(e){}return null}
-function log(text,kind=''){ S.log.unshift({d:S.day,text,kind}); S.log=S.log.slice(0,120); }
+function log(text,kind=''){ S.log.unshift({d:S.day,text,kind}); S.log=S.log.slice(0,400); }
 
 const live = ()=>SLOTS.map(k=>S.eq[k]).filter(g=>g&&g.dur>0);
 function gearPower(g){ if(!g||g.dur<=0) return 0; return g.dur/g.max<.25 ? g.power/2 : g.power; }
@@ -809,6 +1199,20 @@ function wxNote(){
   return fx.length?fx.join(', '):'no effects';
 }
 const mealKey = ()=>S.stomach?'skip':S.meal;
+// tooltip helper: "Title|line one\nline two"
+const tip = (t,lines)=>' data-tip="'+esc(t+(lines&&lines.filter(Boolean).length?'|'+lines.filter(Boolean).join('\n'):''))+'"';
+function wxLines(){
+  const w=weather(), sn=season(), L=[];
+  if(w.wear!==1) L.push('Gear wear '+(w.wear>1?'+':'')+Math.round((w.wear-1)*100)+'%');
+  if(w.energy!==1) L.push('Energy costs '+(w.energy>1?'+':'')+Math.round((w.energy-1)*100)+'%');
+  if(w.odds) L.push('Quest odds '+Math.round(w.odds*100)+'%');
+  if(w.pay!==1) L.push('Quest pay +'+Math.round((w.pay-1)*100)+'%');
+  if(sn.pay) L.push('Winter: all quests pay +15%');
+  if(!L.length) L.push('No effects today');
+  if(priceMult()>1) L.push('Town prices +'+Math.round((priceMult()-1)*100)+'% (rises every '+CFG.priceEvery+' days)');
+  L.push('','Weather changes every morning. '+sn.name+' lasts '+SEASON_DAYS+' days.');
+  return L;
+}
 const TITLE = 'the Old Veteran';
 const plainName = n=>{ n=(n||'').trim(); return n && n.toLowerCase()!=='the old veteran' ? n : ''; };
 const titleFor = n=>plainName(n) ? plainName(n)+', '+TITLE : 'The Old Veteran';
@@ -820,13 +1224,13 @@ function renderTop(){
   document.getElementById('top').innerHTML=
     '<div class="who"><div class="avatar">'+ic('vet')+'</div><div style="flex:1;min-width:0">'+
       '<h1 title="'+esc(heroName())+'">'+esc(heroName())+'</h1><div class="sub">Day '+S.day+' · '+phaseLabel()+(S.questsToday?' · '+S.questsToday+' quest'+(S.questsToday>1?'s':'')+' today':'')+'</div>'+
-      '<div class="bars"><div class="bar fund" title="Retirement fund. Notches mark farm milestones."><span style="width:'+pct+'%"></span>'+MILESTONES.slice(0,-1).map(m=>'<i class="tick'+(S.gold>=m.at?' on':'')+'" style="left:'+(m.at/CFG.goal*100)+'%"></i>').join('')+'</div><span class="num">'+Math.floor(S.gold/100).toLocaleString()+' / '+(CFG.goal/100).toLocaleString()+'g</span>'+
-      '<div class="bar energy '+(lowE?'low':'')+'" title="Energy"><span style="width:'+S.energy+'%"></span></div><span class="num">'+S.energy+' / '+maxE()+'</span></div>'+
+      '<div class="bars"><div class="bar fund"'+tip('Retirement fund',[Math.floor(S.gold/100).toLocaleString()+' of '+(CFG.goal/100).toLocaleString()+'g saved',(MILESTONES[(S.ms??-1)+1]?'Next: '+MILESTONES[(S.ms??-1)+1].name+' at '+(MILESTONES[(S.ms??-1)+1].at/100).toLocaleString()+'g':'The whole farm is paid for'),'Notches mark the farm milestones.'])+'><span style="width:'+pct+'%"></span>'+MILESTONES.slice(0,-1).map(m=>'<i class="tick'+(S.gold>=m.at?' on':'')+'" style="left:'+(m.at/CFG.goal*100)+'%"></i>').join('')+'</div><span class="num">'+Math.floor(S.gold/100).toLocaleString()+' / '+(CFG.goal/100).toLocaleString()+'g</span>'+
+      '<div class="bar energy '+(lowE?'low':'')+'"'+tip('Energy',[S.energy+' of '+maxE(),maxE()<100?'Injuries lowered your max from 100':'','Quests cost energy. Low energy lowers your odds.','Lodging, supper, and rations bring it back.'])+'><span style="width:'+S.energy+'%"></span></div><span class="num">'+S.energy+' / '+maxE()+'</span></div>'+
     '</div></div>'+
     '<div class="hstats">'+
-      '<div class="tile"><span class="label">Purse</span><b>'+fmt(S.gold,true)+'</b></div>'+
-      '<div class="tile power"><span class="label">Power</span><b>'+power()+'</b></div>'+
-      '<div class="tile"><span class="label">Rating so far</span>'+starsHTML(sc.stars,'mini-stars')+'</div>'+
+      '<div class="tile"'+tip('Purse',[plain(S.gold),'1 gold = 10 silver = 100 copper'])+'><span class="label">Purse</span><b>'+fmt(S.gold,true)+'</b></div>'+
+      '<div class="tile power"'+tip('Combat power',['From your gear'+(injuries().some(i=>i.power)?', minus injuries':''),'Each quest needs a minimum power. More power means better odds.'])+'><span class="label">Power</span><b>'+power()+'</b></div>'+
+      '<div class="tile"'+tip('Rating so far',[score().stars.toFixed(1)+' of 5 stars','70% from gold saved toward 5,000g','30% from days lasted ('+CFG.targetDays+' days for full credit)'])+'><span class="label">Rating so far</span>'+starsHTML(sc.stars,'mini-stars')+'</div>'+
       '<div class="hbtns">'+(S.askNew
         ? '<button class="confirm" data-a="newrun">Yes, start over</button><button data-a="newrun-no">Keep playing</button>'
         : '<button data-a="mute" title="Sound effects">'+(muted?'Sound off':'Sound on')+'</button><button data-a="retire" '+(S.trip||S.ended?'disabled':'')+'>Retire now</button><button data-a="newrun-ask">New run</button>')+'</div>'+
@@ -835,9 +1239,9 @@ function renderTop(){
 
 function slotHTML(k){
   const g=S.eq[k], sel=S.selSlot===k?' sel':'';
-  if(!g) return '<button class="slot empty'+sel+'" data-a="selSlot" data-id="'+k+'" aria-label="'+SLOT_NAME[k]+': empty">'+ic(k)+'<span class="sname">'+SLOT_NAME[k]+'</span></button>';
+  if(!g) return '<button class="slot empty'+sel+'" data-a="selSlot" data-id="'+k+'" aria-label="'+SLOT_NAME[k]+': empty"'+tip(SLOT_NAME[k]+' slot',['Empty. Equip something from your bag.'])+'>'+ic(k)+'<span class="sname">'+SLOT_NAME[k]+'</span></button>';
   const r=g.dur/g.max, dc=r<.25?'low':r<.5?'mid':'';
-  return '<button class="slot'+(g.dur<=0?' broken':'')+sel+'" style="--rc:'+RARITY[g.rarity].c+'" data-a="selSlot" data-id="'+k+'" aria-label="'+esc(g.name)+'">'+ic(k)+
+  return '<button class="slot'+(g.dur<=0?' broken':'')+sel+'" style="--rc:'+RARITY[g.rarity].c+'" data-a="selSlot" data-id="'+k+'" aria-label="'+esc(g.name)+'"'+tip(g.name,[RARITY[g.rarity].label+' '+SLOT_NAME[g.slot].toLowerCase(),'Power '+g.power+(g.dur>0&&r<.25?' (fighting at half power)':''),'Durability '+g.dur+'/'+g.max+(g.dur<=0?' · broken':''),'Repaired '+g.repairs+' time'+(g.repairs===1?'':'s')])+'>'+ic(k)+
     '<span class="dbar '+dc+'"><span style="width:'+r*100+'%"></span></span></button>';
 }
 
@@ -845,18 +1249,18 @@ function renderGear(){
   document.getElementById('intact').textContent=live().length+' of 5 intact';
   const nextM=MILESTONES[(S.ms===undefined?-1:S.ms)+1];
   let h='<div class="doll"><div class="slots">'+['helm','armor','boots'].map(slotHTML).join('')+'</div>'+
-    '<div class="center"><div class="cstat hero"><span class="label">Power</span><b>'+power()+'</b></div>'+
-    '<div class="cstat"><span class="label">Energy</span><b>'+S.energy+'<small>/'+maxE()+'</small></b></div>'+
-    '<div class="cstat"><span class="label">Next goal'+(nextM?' · '+Math.floor(nextM.at/100).toLocaleString()+'g':'')+'</span><b class="farmnext">'+(nextM?esc(nextM.name):'All saved up')+'</b></div></div>'+
+    '<div class="center"><div class="cstat hero"'+tip('Combat power',SLOTS.map(k=>S.eq[k]?SLOT_NAME[k]+': '+Math.round(gearPower(S.eq[k])):SLOT_NAME[k]+': empty').concat(injuries().filter(i=>i.power).map(i=>i.name+': '+i.power)))+'><span class="label">Power</span><b>'+power()+'</b></div>'+
+    '<div class="cstat"'+tip('Energy',[S.energy+' of '+maxE(),...injuries().filter(i=>i.energy).map(i=>i.name+': '+i.energy+' max'),'Eaten today: '+(S.rationsToday||0)+' ration'+((S.rationsToday||0)===1?'':'s')])+'><span class="label">Energy</span><b>'+S.energy+'<small>/'+maxE()+'</small></b></div>'+
+    '<div class="cstat"'+tip('Farm milestones',MILESTONES.map((m,i)=>(i<=(S.ms??-1)?'✓ ':'· ')+m.name+' · '+(m.at/100).toLocaleString()+'g'))+'><span class="label">Next goal'+(nextM?' · '+Math.floor(nextM.at/100).toLocaleString()+'g':'')+'</span><b class="farmnext">'+(nextM?esc(nextM.name):'All saved up')+'</b></div></div>'+
     '<div class="slots">'+['weapon','shield'].map(slotHTML).join('')+'</div></div>';
   const g=S.eq[S.selSlot];
   if(!g){
     h+='<div class="detail"><div class="dtop"><span class="nm">'+SLOT_NAME[S.selSlot]+' slot</span><span class="dsub">Empty</span></div><p class="empty-note">Equip something from your bag.</p></div>';
   } else {
     const r=g.dur/g.max, dc=r<.25?'low':r<.5?'mid':'', rc=repairCost(g);
-    let state=g.dur<=0?' · <span style="color:var(--bad)">Broken</span>':r<.25?' · <span style="color:var(--gold)">Worn, half power</span>':'';
-    h+='<div class="detail"><div class="dtop"><span class="nm" style="color:'+RARITY[g.rarity].c+'" title="'+esc(g.name)+'">'+esc(g.name)+'</span><span class="dsub">'+RARITY[g.rarity].label+'</span></div>'+
-      '<div class="meta"><span>Power <b>'+g.power+'</b></span><span>Repairs <b>'+g.repairs+'</b></span><span>Worth <b>'+fmt(sellValue(g),true)+'</b></span>'+state.replace(' · ','')+'</div>'+
+    const state=g.dur<=0?'<span class="dsub" style="color:var(--bad)">Broken</span>':r<.25?'<span class="dsub" style="color:var(--gold)" title="Under 25% durability fights at half power">Worn · half power</span>':'<span class="dsub">'+RARITY[g.rarity].label+'</span>';
+    h+='<div class="detail"><div class="dtop"><span class="nm" style="color:'+RARITY[g.rarity].c+'" title="'+esc(g.name)+'">'+esc(g.name)+'</span>'+state+'</div>'+
+      '<div class="meta"><span>Power <b>'+g.power+'</b></span><span>Repairs <b>'+g.repairs+'</b></span><span>Worth <b>'+fmt(sellValue(g),true)+'</b></span></div>'+
       '<div class="drow"><div class="durrow '+dc+'"><div class="bar"><span style="width:'+r*100+'%"></span></div><span class="num">'+g.dur+'/'+g.max+'</span></div>'+
       '<div class="acts">'+(S.pendingSell==='eq'
         ? '<button class="confirm" data-a="sellEq">Sell for '+plain(sellValue(g))+'</button><button data-a="sellCancel">Keep it</button>'
@@ -864,12 +1268,21 @@ function renderGear(){
       '</div></div></div>';
   }
   const inj=injuries();
-  const stom=S.stomach?'<div class="inj" title="Too many rations today. You\'ll wake up with half your energy."><span><b>Stomach Ache</b><small>half energy tomorrow</small></span></div>':'';
-  const injHTML='<div class="injuries">'+stom+(inj.length
-    ? inj.map(i=>'<div class="inj" title="'+esc(i.name+': '+i.desc)+'"><span><b>'+esc(i.name)+'</b><small>'+esc(i.desc.replace(' max energy',' energy'))+'</small></span><button data-a="heal" data-id="'+i.key+'" title="See the healer for '+plain(healCost())+'" '+(!inTown()||S.gold<healCost()?'disabled':'')+'>Heal</button></div>').join('')
+  const stom=S.stomach?'<div class="inj"'+tip('Stomach Ache',['Too many rations today.','You\'ll wake up with half your energy.','No supper or rations until it passes.'])+'><span><b>Stomach Ache</b><small>half energy tomorrow</small></span></div>':'';
+  const many=inj.length+(S.stomach?1:0)>2;
+  let injHTML;
+  if(many){
+    // 3 or more: one summary line so the panel never grows
+    const e=inj.reduce((a,i)=>a+i.energy,0), p=inj.reduce((a,i)=>a+i.power,0);
+    const worst=inj.slice().sort((a,b)=>(a.energy+a.power*3)-(b.energy+b.power*3))[0];
+    const fx=[e?e+' energy':'',p?p+' power':'',S.stomach?'stomach ache':''].filter(Boolean).join(' · ');
+    injHTML='<div class="injsum" title="'+esc(inj.map(i=>i.name+' ('+i.desc+')').join(', ')+(S.stomach?', Stomach Ache (half energy tomorrow)':''))+'"><span class="txt"><b>'+(inj.length+(S.stomach?1:0))+' injuries</b><small>'+esc(fx)+'</small></span>'+
+      (worst?'<button data-a="heal" data-id="'+worst.key+'" title="Treat your '+esc(worst.name.toLowerCase())+' for '+plain(healCost())+'" '+(!inTown()||S.gold<healCost()?'disabled':'')+'>Heal worst · '+gShort(healCost())+'</button>':'')+'</div>';
+  } else injHTML='<div class="injuries">'+stom+(inj.length
+    ? inj.map(i=>'<div class="inj"'+tip(i.name,[i.desc,'Lasts until you see the healer ('+plain(healCost())+').'])+'><span><b>'+esc(i.name)+'</b><small>'+esc(i.desc.replace(' max energy',' energy'))+'</small></span><button data-a="heal" data-id="'+i.key+'" title="See the healer for '+plain(healCost())+'" '+(!inTown()||S.gold<healCost()?'disabled':'')+'>Heal</button></div>').join('')
     : (stom?'':'<div class="inj-none"><span class="label">Injuries</span><span class="empty-note">None yet</span></div>'))+'</div>';
   // separator, then weather, then injuries
-  h+='<div class="conds"><div class="wxcard" title="Weather changes every morning"><span class="label">'+season().name+'</span><b>'+esc(weather().name)+'</b><span>'+esc(wxNote())+'</span></div>'+injHTML+'</div>';
+  h+='<div class="conds"><div class="wxcard" tabindex="0"'+tip(season().name+' · '+weather().name,wxLines())+'><span class="label">'+season().name+'</span><b>'+esc(weather().name)+'</b><span class="wxinfo" aria-hidden="true">i</span></div>'+injHTML+'</div>';
   document.getElementById('gear').innerHTML=h;
 }
 
@@ -902,7 +1315,7 @@ function renderAdv(){
     return;
   }
   const rc=rerollCost();
-  head.innerHTML='<h2>Adventures</h2><span class="acts"><button data-a="reroll" title="New quests for today. Price doubles each time and resets tomorrow." '+(S.ended||S.gold<rc?'disabled':'')+'>Reroll · '+fmt(rc,true)+'</button>'+(S.questsToday?'<button data-a="endDay" title="Head back to town for lodging and supper">End the day</button>':'<button data-a="rest" '+(S.ended?'disabled':'')+'>Rest day (+'+CFG.restBonus+')</button>')+'</span>';
+  head.innerHTML='<h2>Adventures</h2><span class="acts"><button data-a="reroll" title="New quests for today. Price doubles each time and resets tomorrow." '+(S.ended||S.gold<rc?'disabled':'')+'>Reroll · '+fmt(rc,true)+'</button>'+(S.questsToday?'<button data-a="endDay" title="Head back to town for lodging and supper">End the day</button>':'<button data-a="rest"'+tip('Rest day',['Skip questing today for +'+CFG.restBonus+' energy.','Only before your first quest of the day.'])+' '+(S.ended?'disabled':'')+'>Rest day (+'+CFG.restBonus+')</button>')+'</span>';
   let h='';
   if(S.event&&S.event.type==='merchant'&&S.eq[S.event.slot]){
     const g=S.eq[S.event.slot];
@@ -921,8 +1334,8 @@ function renderAdv(){
     h+='<div class="job'+(done?' done':locked?' locked':'')+'" style="--tc:'+TIER_COLOR[j.tier]+'">'+
       '<div class="badge">'+ic(JOB_ICON[j.key])+'</div>'+
       '<div class="ttl"><h3>'+esc(j.name)+'</h3><span class="tier">'+TIER_NAME[j.tier]+' · '+esc(j.where)+(done?' · <span class="donetag">Done today</span>':'')+(!locked&&S.energy<jobEnergy(j)?' · <span class="tired">Too tired, odds halved</span>':'')+'</span></div>'+
-      '<div class="stats"><span>Pays<b>'+pay+'</b></span><span>Time<b>'+j.secs+'s</b></span><span>Wear<b>'+jobWear(j)+'</b></span>'+
-      '<span>Energy<b>−'+jobEnergy(j)+'</b></span><span>Loot<b>'+Math.round(j.loot*100)+'%</b></span><span>Odds<b class="odds '+oc+'">'+(c===0?'–':Math.round(c*100)+'%')+(wx().odds?'<i class="wxodd" title="'+esc(weather().name)+'"> '+Math.round(wx().odds*100)+'</i>':'')+'</b></span></div>'+
+      '<div class="stats"><span'+tip('Pays',['Gold for a success.','A failure pays only 25%.',wx().pay!==1?'Weather and season are already included.':''])+'>Pays<b>'+pay+'</b></span><span'+tip('Time',['How long this quest takes in real time.'])+'>Time<b>'+j.secs+'s</b></span><span'+tip('Wear',['Durability lost, spread across your gear.','A failure wears 50% more.',weather().wear!==1?weather().name+' is already included.':''])+'>Wear<b>'+jobWear(j)+'</b></span>'+
+      '<span'+tip('Energy',['Used when you set out.','Setting out with less than this halves your odds.'])+'>Energy<b>−'+jobEnergy(j)+'</b></span><span'+tip('Loot',[Math.round(j.loot*100)+'% chance of '+j.mat.name,j.gearDrop?Math.round(j.gearDrop*100)+'% chance of a gear drop':'No gear drops here'])+'>Loot<b>'+Math.round(j.loot*100)+'%</b></span><span'+tip('Odds',['Chance of success.','Needs '+j.min+' power. You have '+power()+'.',weather().odds?weather().name+': '+Math.round(weather().odds*100)+'%':'',S.energy<jobEnergy(j)?'Too tired: odds halved':''])+'>Odds<b class="odds '+oc+'">'+(c===0?'–':Math.round(c*100)+'%')+(wx().odds?'<i class="wxodd" title="'+esc(weather().name)+'"> '+Math.round(wx().odds*100)+'</i>':'')+'</b></span></div>'+
       '<button class="go '+(locked?'':'primary')+'" data-a="job" data-id="'+j.key+'" '+(locked||S.ended?'disabled':'')+'>'+(done?'Done':locked?'Needs '+j.min:'Set out')+'</button></div>';
   });
   body.innerHTML=h+'</div>';
@@ -943,7 +1356,7 @@ function renderBag(){
     if(!it){ h+='<div class="cell blank"></div>'; continue; }
     const iconK=it.kind==='mat'?it.icon:it.slot;
     const up=it.kind==='gear'&&gearPower(it)>gearPower(S.eq[it.slot]), mk=it.kind==='mat'?marketMult(it.name):1;
-    h+='<button class="cell'+(S.selBag===it.uid?' sel':'')+'" style="--rc:'+(it.kind==='mat'?'#6b7486':RARITY[it.rarity].c)+'" data-a="selBag" data-id="'+it.uid+'" aria-label="'+esc(it.name)+'">'+ic(iconK)+(up||mk>=1.2?'<span class="up">▲</span>':mk<=.8?'<span class="dn">▼</span>':'')+'</button>';
+    h+='<button class="cell'+(S.selBag===it.uid?' sel':'')+'" style="--rc:'+(it.kind==='mat'?'#6b7486':RARITY[it.rarity].c)+'" data-a="selBag" data-id="'+it.uid+'" aria-label="'+esc(it.name)+'"'+(it.kind==='mat'?tip(it.name,['Material','Sells for '+plain(sellValue(it))+' today ('+mk.toFixed(2)+'x usual)']):tip(it.name,[RARITY[it.rarity].label+' '+SLOT_NAME[it.slot].toLowerCase(),'Power '+it.power+' · durability '+it.dur+'/'+it.max,up?'Stronger than what you have equipped':'']))+'>'+ic(iconK)+(up||mk>=1.2?'<span class="up">▲</span>':mk<=.8?'<span class="dn">▼</span>':'')+'</button>';
   }
   h+='</div><div class="bagdetail">';
   const it=S.bag.find(x=>x.uid===S.selBag);
@@ -1033,7 +1446,7 @@ function renderEnd(){
     '<button class="primary" data-a="newrun">Play again</button></div></div>';
 }
 
-function render(){ if(S&&!S.ended) checkMilestones(); renderTop(); renderGear(); renderJournal(); renderAdv(); renderBag(); renderEnd(); }
+function render(){ if(S&&!S.ended) checkMilestones(); renderTop(); renderGear(); renderJournal(); renderAdv(); renderBag(); renderEnd(); if(typeof document.querySelectorAll==='function') tipify(); }
 
 function tick(){
   if(!S||!S.trip) return;
@@ -1051,6 +1464,26 @@ function tick(){
   if(l) l.textContent=Math.ceil(left/1000)+'s';
 }
 setInterval(tick,200);
+
+// ---------- tooltips ----------
+let TIP=null;
+function tipify(){ document.querySelectorAll('[title]').forEach(el=>{ if(!el.dataset.tip) el.dataset.tip=el.getAttribute('title'); el.removeAttribute('title'); }); }
+function showTip(el){
+  if(!TIP){ TIP=document.createElement('div'); TIP.className='tip'; TIP.setAttribute('role','tooltip'); document.body.appendChild(TIP); }
+  const raw=el.dataset.tip||''; const [t,body]=raw.includes('|')?raw.split('|'):[raw,''];
+  TIP.innerHTML=(body?'<b>'+esc(t)+'</b>'+esc(body).replace(/\n\n/g,'<span class="gap"></span>').replace(/\n/g,'<br>'):esc(t));
+  TIP.classList.add('on');
+  const r=el.getBoundingClientRect(), tw=TIP.offsetWidth, th=TIP.offsetHeight, m=8;
+  let x=r.left+r.width/2-tw/2, y=r.bottom+m;
+  if(y+th>innerHeight-m) y=r.top-th-m;
+  x=Math.max(m,Math.min(x,innerWidth-tw-m)); y=Math.max(m,y);
+  TIP.style.left=x+'px'; TIP.style.top=y+'px';
+}
+function hideTip(){ if(TIP) TIP.classList.remove('on'); }
+document.addEventListener('mouseover',e=>{ const el=e.target.closest&&e.target.closest('[data-tip]'); el?showTip(el):hideTip(); });
+document.addEventListener('focusin',e=>{ const el=e.target.closest&&e.target.closest('[data-tip]'); el?showTip(el):hideTip(); });
+document.addEventListener('scroll',hideTip,true);
+document.addEventListener('click',hideTip,true);
 
 document.addEventListener('click',e=>{
   const b=e.target.closest('button[data-a]'); if(!b||b.disabled) return;

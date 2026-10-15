@@ -39,33 +39,53 @@ Your retirement goal is **5000 gold**.
 
 Adventures take real time, from 10 seconds for the easy stuff up to a full minute for the big ones.
 
-There are 17 adventures in rotation. The board shows 6 at a time: Haul Crates plus five random picks from the rest. It rerolls every new morning. Don't like today's board? Hit **Reroll** for a fresh one. The first reroll each day costs 5 silver, and every reroll after that costs double the last (5s, 1g, 2g, 4g, and so on). The price resets every morning. A failed adventure pays only 25% and wears your gear down 50% more.
+There are 37 adventures in rotation. The board shows 6 at a time: Haul Crates plus five random picks from the rest. It rerolls every new morning. Don't like today's board? Hit **Reroll** for a fresh one. The first reroll each day costs 5 silver, and every reroll after that costs double the last (5s, 1g, 2g, 4g, and so on). The price resets every morning. A failed adventure pays only 25% and wears your gear down 50% more.
 
-| Adventure | Power needed | Time | Pays | Material drop | Gear drop |
-|-----------|--------------|------|------|---------------|-----------|
-| Haul Crates | 0 | 10s | 2 to 5g | 3% | None |
-| Gather Moonleaf | 0 | 12s | 3 to 6g | 5% | None |
-| Rooster Roundup | 5 | 14s | 7 to 12g | 6% | 1% |
-| Cellar Rats | 8 | 15s | 8 to 14g | 6% | 1% |
-| Wolf Pack | 12 | 18s | 9 to 15g | 7% | 1% |
-| Goblin Camp | 20 | 22s | 18 to 28g | 8% | 2% |
-| Restless Crypt | 24 | 26s | 20 to 30g | 8% | 2% |
-| Caravan Escort | 30 | 30s | 28 to 40g | 10% | 3% |
-| Bandit Toll Bridge | 32 | 30s | 30 to 42g | 10% | 3% |
-| Haunted Mine | 34 | 32s | 30 to 44g | 10% | 3% |
-| Ogre Bounty | 42 | 38s | 40 to 60g | 12% | 4% |
-| Swamp Troll | 45 | 40s | 42 to 64g | 12% | 4% |
-| Wyvern Nest | 52 | 48s | 64 to 92g | 14% | 5% |
-| The Hedge Necromancer | 54 | 50s | 68 to 96g | 14% | 5% |
-| Hill Giant's Toll | 56 | 52s | 72 to 100g | 15% | 5% |
-| Old Rival's Last Duel | 58 | 58s | 120 to 170g | 18% | 7% |
-| The Ashen Drake | 60 | 60s | 130 to 180g | 18% | 7% |
+| Adventure | Difficulty | Power needed | Time | Pays | Material drop | Gear drop |
+|-----------|------------|--------------|------|------|---------------|-----------|
+| Haul Crates | Odd job | 0 | 10s | 2 to 5g | 3% | None |
+| Deliver the Post | Odd job | 0 | 11s | 2 to 5g | 4% | None |
+| Gather Moonleaf | Odd job | 0 | 12s | 3 to 6g | 5% | None |
+| Sheep Shearing | Odd job | 0 | 13s | 3 to 6g | 5% | None |
+| Rooster Roundup | Easy | 5 | 14s | 7 to 12g | 6% | 1% |
+| Angry Beehive | Easy | 6 | 14s | 7 to 12g | 6% | 1% |
+| Giant Pumpkin Haul | Easy | 7 | 16s | 8 to 13g | 6% | 1% |
+| Cellar Rats | Easy | 8 | 15s | 8 to 14g | 6% | 1% |
+| Spider Nest | Easy | 10 | 17s | 9 to 15g | 7% | 1% |
+| Tavern Bouncer | Easy | 11 | 16s | 9 to 14g | 7% | 1% |
+| Wolf Pack | Easy | 12 | 18s | 9 to 15g | 7% | 1% |
+| Kobold Tunnels | Easy | 18 | 22s | 17 to 26g | 8% | 2% |
+| Goblin Camp | Easy | 20 | 22s | 18 to 28g | 8% | 2% |
+| Smugglers' Cove | Easy | 22 | 24s | 19 to 29g | 8% | 2% |
+| The Walking Scarecrow | Easy | 22 | 24s | 19 to 28g | 8% | 2% |
+| Restless Crypt | Easy | 24 | 26s | 20 to 30g | 8% | 2% |
+| Great Tusked Boar | Easy | 26 | 26s | 21 to 31g | 9% | 2% |
+| Caravan Escort | Medium | 30 | 30s | 28 to 40g | 10% | 3% |
+| Bandit Toll Bridge | Medium | 32 | 30s | 30 to 42g | 10% | 3% |
+| The Bog Witch's Bargain | Medium | 32 | 32s | 30 to 43g | 10% | 3% |
+| Haunted Mine | Medium | 34 | 32s | 30 to 44g | 10% | 3% |
+| Lighthouse Siege | Medium | 35 | 34s | 32 to 46g | 10% | 3% |
+| Village Tourney | Medium | 36 | 32s | 32 to 45g | 10% | 3% |
+| Ogre Bounty | Hard | 42 | 38s | 40 to 60g | 12% | 4% |
+| Basilisk Den | Hard | 44 | 40s | 42 to 62g | 12% | 4% |
+| Swamp Troll | Hard | 45 | 40s | 42 to 64g | 12% | 4% |
+| Bandit King's Fort | Hard | 46 | 42s | 44 to 66g | 12% | 4% |
+| Haunted Manor | Hard | 48 | 42s | 46 to 68g | 12% | 4% |
+| Wyvern Nest | Hard | 52 | 48s | 64 to 92g | 14% | 5% |
+| The Hedge Necromancer | Hard | 54 | 50s | 68 to 96g | 14% | 5% |
+| Kraken in the Harbor | Hard | 55 | 52s | 70 to 98g | 14% | 5% |
+| Hill Giant's Toll | Hard | 56 | 52s | 72 to 100g | 15% | 5% |
+| The Frostpeak Yeti | Hard | 56 | 54s | 74 to 102g | 15% | 5% |
+| Old Rival's Last Duel | Deadly | 58 | 58s | 120 to 170g | 18% | 7% |
+| The Drowned Lich | Deadly | 59 | 58s | 125 to 175g | 18% | 7% |
+| The Ashen Drake | Deadly | 60 | 60s | 130 to 180g | 18% | 7% |
+| One Last Dungeon | Deadly | 60 | 60s | 135 to 190g | 18% | 7% |
 
 ## Gear
 
 You start with five pieces: weapon, armor, shield, helm, and boots. Each one adds to your combat power, and your power decides which adventures you can take.
 
-- **Durability:** Every adventure wears your gear down. When a piece hits 0, it breaks and stops adding power.
+- **Durability:** Every adventure wears your gear down. When a piece hits 0, it breaks and stops adding power. The wear numbers on the quest cards already include weather.
 - **Worn gear:** Anything under 25% durability fights at half power.
 - **Repairs:** You can repair gear, but every repair on the same piece costs 1.6x more than the last one.
 - **Selling:** Your legendary sword, Emberbrand, sells for around 1500 gold on day one. That's a huge head start, but you lose almost half your power.
@@ -148,6 +168,10 @@ Your ending changes based on how much gold you saved. It ranges from a big farm 
 
 Every finished run is saved, and the ending screen shows your top 5 runs so you can try to beat your best.
 
+## Tooltips
+
+Hover almost anything to see what it does. Weather shows just the season and conditions, like "Winter · Snow", and hovering it lists every effect. Gear slots, injuries, quest stats, bag items, the gold and energy bars, and the header tiles all have tooltips too.
+
 ## Sound
 
 The game has simple built-in sound effects for setting out, coming back, loot, gear breaking, injuries, selling, and farm milestones. Use the **Sound on / Sound off** button in the header to toggle them.
@@ -170,7 +194,7 @@ Your progress saves automatically in your browser, including adventures in progr
 
 All the numbers live at the top of `game.js`:
 
-- `CFG` holds the retirement goal, starting gold, target days, star weighting, ration cost, repair cost growth, bag size (18), how many adventures show on the board (6), the reroll cost and growth, the healer's cost, how fast prices rise, the extra injury risk per quest (`fatigueRisk`), and how many rations are safe in a day (`safeRations`)
+- `CFG` holds the retirement goal, starting gold, target days, star weighting, ration cost, repair cost growth, bag size (18), how many adventures show on the board (6), the reroll cost and growth, the healer's cost, how fast prices rise, the extra injury risk per quest (`fatigueRisk`), how many rations are safe in a day (`safeRations`), and how fast gear wears out (`wearMult`, where 1 is full wear and 0.6 is 40% less)
 - `LODGING` and `MEALS` hold nightly costs and energy
 - `START_GEAR` holds your starting gear
 - `JOBS` holds each adventure's power requirement, time, pay range, wear, energy cost, loot chances, and materials
