@@ -40,35 +40,22 @@ Adventures take real time, from 10 seconds for the easy stuff up to a full minut
 | Adventure | Power needed | Time | Pays | Material drop | Gear drop |
 |-----------|--------------|------|------|---------------|-----------|
 | Haul Crates | 0 | 10s | 2 to 5g | 3% | None |
+| Gather Moonleaf | 0 | 12s | 3 to 6g | 5% | None |
+| Rooster Roundup | 5 | 14s | 7 to 12g | 6% | 1% |
 | Cellar Rats | 8 | 15s | 8 to 14g | 6% | 1% |
+| Wolf Pack | 12 | 18s | 9 to 15g | 7% | 1% |
 | Goblin Camp | 20 | 22s | 18 to 28g | 8% | 2% |
+| Restless Crypt | 24 | 26s | 20 to 30g | 8% | 2% |
 | Caravan Escort | 30 | 30s | 28 to 40g | 10% | 3% |
+| Bandit Toll Bridge | 32 | 30s | 30 to 42g | 10% | 3% |
+| Haunted Mine | 34 | 32s | 30 to 44g | 10% | 3% |
 | Ogre Bounty | 42 | 38s | 40 to 60g | 12% | 4% |
+| Swamp Troll | 45 | 40s | 42 to 64g | 12% | 4% |
 | Wyvern Nest | 52 | 48s | 64 to 92g | 14% | 5% |
+| The Hedge Necromancer | 54 | 50s | 68 to 96g | 14% | 5% |
+| Hill Giant's Toll | 56 | 52s | 72 to 100g | 15% | 5% |
+| Old Rival's Last Duel | 58 | 58s | 120 to 170g | 18% | 7% |
 | The Ashen Drake | 60 | 60s | 130 to 180g | 18% | 7% |
-
-Each morning the board shows 6 adventures: Haul Crates plus five random ones. A failed adventure pays only 25% and wears your gear down 50% more.
-
-## Loot
-
-Loot is rare. Adventures can sometimes bring stuff back (see the drop chances in the table above):
-
-- **Materials** like rat pelts, ogre tusks, and drake scales. These are just for selling. Tougher adventures drop more valuable materials.
-- **Gear** from tougher adventures. It comes in Common, Rare, Epic, and Legendary. You can equip it to replace a broken or weaker piece, or sell it. A green arrow in your bag means the item is stronger than what you have equipped.
-
-Your bag holds 18 items. If it's full, new loot gets left behind.
-
-## Daily Costs
-
-| Item | Cost | Energy |
-|------|------|--------|
-| Room at the inn | 2s | +35 |
-| Sleep rough | Free | +10 |
-| Hearty feast | 5s | +20 |
-| Tavern plate | 3s | +12 |
-| Thin stew | 1s | +5 |
-| Skip supper | Free | +0 |
-| Ration | 1s | +15 (eat any time, even on the road) |
 
 ## Gear
 

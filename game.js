@@ -40,13 +40,23 @@ const RARITY = {
 };
 // secs = how long the adventure takes. loot = chance of materials, gearDrop = chance of a gear piece (on success)
 const JOBS = [
-  {key:'docks',  tier:0,name:'Haul Crates',     where:'The docks',   min:0, secs:10,pay:[200,500],  wear:1, energy:20,loot:0.03,gearDrop:0,  mat:{name:'Crate of Salted Fish',icon:'crate',v:[300,600]},   prefix:''},
-  {key:'rats',   tier:1,name:'Cellar Rats',     where:'Old Town',    min:8, secs:15,pay:[800,1400],  wear:5, energy:20,loot:0.06,gearDrop:0.01,mat:{name:'Bundle of Rat Pelts',icon:'pelt',v:[800,1500]},    prefix:'Cellar-Found'},
-  {key:'goblins',tier:2,name:'Goblin Camp',     where:'Thornwood',   min:20,secs:22,pay:[1800,2800], wear:10,energy:28,loot:0.08, gearDrop:0.02, mat:{name:'Goblin Trinkets',icon:'trinket',v:[1500,3000]},    prefix:'Goblin-Made'},
-  {key:'escort', tier:3,name:'Caravan Escort',  where:'Salt Road',   min:30,secs:30,pay:[2800,4000],wear:13,energy:35,loot:0.1, gearDrop:0.03,mat:{name:'Spice Sachet',icon:'sachet',v:[3000,5000]},      prefix:'Caravan Guard\'s'},
-  {key:'ogre',   tier:4,name:'Ogre Bounty',     where:'Millbrook',   min:42,secs:38,pay:[4000,6000],wear:18,energy:40,loot:0.12,gearDrop:0.04,mat:{name:'Ogre Tusk',icon:'tusk',v:[5000,8000]},          prefix:'Ogre-Hide'},
-  {key:'wyvern', tier:5,name:'Wyvern Nest',     where:'Gray Cliffs', min:52,secs:48,pay:[6400,9200],wear:26,energy:48,loot:0.14, gearDrop:0.05,mat:{name:'Wyvern Egg',icon:'egg',v:[9000,15000]},         prefix:'Wyvernbone'},
-  {key:'drake',  tier:6,name:'The Ashen Drake', where:'Cinder Peak', min:60,secs:60,pay:[13000,18000],wear:42,energy:60,loot:0.18, gearDrop:0.07,mat:{name:'Ashen Drake Scale',icon:'scale',v:[18000,28000]}, prefix:'Ashen'}
+  {key:"docks",tier:0,name:"Haul Crates",where:"The docks",min:0,secs:10,pay:[200,500],wear:1,energy:20,loot:0.03,gearDrop:0,mat:{name:"Crate of Salted Fish",icon:"crate",v:[300,600]},prefix:""},
+  {key:"herbs",tier:0,name:"Gather Moonleaf",where:"Willow Hollow",min:0,secs:12,pay:[300,600],wear:1,energy:18,loot:0.05,gearDrop:0,mat:{name:"Bundle of Moonleaf",icon:"herb",v:[400,800]},prefix:""},
+  {key:"rooster",tier:1,name:"Rooster Roundup",where:"Fenwick Farm",min:5,secs:14,pay:[700,1200],wear:3,energy:18,loot:0.06,gearDrop:0.01,mat:{name:"Prize Rooster Feather",icon:"feather",v:[600,1200]},prefix:"Barnyard"},
+  {key:"rats",tier:1,name:"Cellar Rats",where:"Old Town",min:8,secs:15,pay:[800,1400],wear:5,energy:20,loot:0.06,gearDrop:0.01,mat:{name:"Bundle of Rat Pelts",icon:"pelt",v:[800,1500]},prefix:"Cellar-Found"},
+  {key:"wolves",tier:1,name:"Wolf Pack",where:"Hollow Fen",min:12,secs:18,pay:[900,1500],wear:6,energy:24,loot:0.07,gearDrop:0.01,mat:{name:"Gray Wolf Pelt",icon:"pelt",v:[1000,1800]},prefix:"Wolfhide"},
+  {key:"goblins",tier:2,name:"Goblin Camp",where:"Thornwood",min:20,secs:22,pay:[1800,2800],wear:10,energy:28,loot:0.08,gearDrop:0.02,mat:{name:"Goblin Trinkets",icon:"trinket",v:[1500,3000]},prefix:"Goblin-Made"},
+  {key:"crypt",tier:2,name:"Restless Crypt",where:"Ashby Churchyard",min:24,secs:26,pay:[2000,3000],wear:11,energy:30,loot:0.08,gearDrop:0.02,mat:{name:"Grave Silver",icon:"gem",v:[2000,3500]},prefix:"Gravewarden's"},
+  {key:"escort",tier:3,name:"Caravan Escort",where:"Salt Road",min:30,secs:30,pay:[2800,4000],wear:13,energy:35,loot:0.1,gearDrop:0.03,mat:{name:"Spice Sachet",icon:"sachet",v:[3000,5000]},prefix:"Caravan Guard's"},
+  {key:"bridge",tier:3,name:"Bandit Toll Bridge",where:"Ferris Crossing",min:32,secs:30,pay:[3000,4200],wear:14,energy:34,loot:0.1,gearDrop:0.03,mat:{name:"Stolen Silverware",icon:"trinket",v:[3000,5000]},prefix:"Bridge Warden's"},
+  {key:"mine",tier:3,name:"Haunted Mine",where:"Copperdeep",min:34,secs:32,pay:[3000,4400],wear:15,energy:36,loot:0.1,gearDrop:0.03,mat:{name:"Copper Ore Nugget",icon:"gem",v:[3500,5500]},prefix:"Miner's"},
+  {key:"ogre",tier:4,name:"Ogre Bounty",where:"Millbrook",min:42,secs:38,pay:[4000,6000],wear:18,energy:40,loot:0.12,gearDrop:0.04,mat:{name:"Ogre Tusk",icon:"tusk",v:[5000,8000]},prefix:"Ogre-Hide"},
+  {key:"troll",tier:4,name:"Swamp Troll",where:"Mirewater",min:45,secs:40,pay:[4200,6400],wear:20,energy:42,loot:0.12,gearDrop:0.04,mat:{name:"Matted Troll Horn",icon:"horn",v:[5500,8500]},prefix:"Trollhide"},
+  {key:"wyvern",tier:5,name:"Wyvern Nest",where:"Gray Cliffs",min:52,secs:48,pay:[6400,9200],wear:26,energy:48,loot:0.14,gearDrop:0.05,mat:{name:"Wyvern Egg",icon:"egg",v:[9000,15000]},prefix:"Wyvernbone"},
+  {key:"necro",tier:5,name:"The Hedge Necromancer",where:"Blackmoor",min:54,secs:50,pay:[6800,9600],wear:27,energy:50,loot:0.14,gearDrop:0.05,mat:{name:"Cursed Grimoire",icon:"skull",v:[10000,16000]},prefix:"Bone-Carved"},
+  {key:"giant",tier:5,name:"Hill Giant's Toll",where:"The Highpass",min:56,secs:52,pay:[7200,10000],wear:30,energy:52,loot:0.15,gearDrop:0.05,mat:{name:"Giant's Toe Ring",icon:"gem",v:[11000,17000]},prefix:"Giantsteel"},
+  {key:"rival",tier:6,name:"Old Rival's Last Duel",where:"Dunmore Arena",min:58,secs:58,pay:[12000,17000],wear:38,energy:55,loot:0.18,gearDrop:0.07,mat:{name:"Rival's Champion Medal",icon:"medal",v:[15000,25000]},prefix:"Rival's"},
+  {key:"drake",tier:6,name:"The Ashen Drake",where:"Cinder Peak",min:60,secs:60,pay:[13000,18000],wear:42,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ashen Drake Scale",icon:"scale",v:[18000,28000]},prefix:"Ashen"}
 ];
 // Story beats shown in the journal during adventures. {gear} becomes a random piece of your equipped gear.
 const STORY = {
@@ -58,13 +68,54 @@ const STORY = {
    "A crate of fish slips and you catch it with your knee. Ow.",
    "The sailors bet on whether the old adventurer can keep up. You keep up.",
    "Your back makes a noise you've never heard before.",
-   "Somebody's parrot keeps calling you grandpa."
+   "Somebody's parrot keeps calling you grandpa.",
+   "A dockhand asks if you're the one from the songs. You say no. You are.",
+   "You find a crate labeled DO NOT DROP. You carry that one very carefully."
   ],
   "win": [
-   "The last crate hits the dock. The foreman nods, which is high praise from him."
+   "The last crate hits the dock. The foreman nods, which is high praise from him.",
+   "The ship sails on time. The foreman tosses you an apple on top of your pay."
   ],
   "lose": [
-   "You drop a crate of wine. The foreman takes it out of your pay."
+   "You drop a crate of wine. The foreman takes it out of your pay.",
+   "You pull something in your shoulder and spend the afternoon sitting on a barrel."
+  ]
+ },
+ "herbs": {
+  "go": [
+   "You head into Willow Hollow with a basket and a borrowed pair of shears."
+  ],
+  "beats": [
+   "Moonleaf only grows in the shade. Naturally, it's all down a steep ravine.",
+   "You find a patch and kneel down. Getting back up is the hard part.",
+   "A squirrel watches you work and seems unimpressed.",
+   "You mistake a nettle for moonleaf. Your hand reminds you for an hour.",
+   "The quiet is nice. You could get used to this kind of work."
+  ],
+  "win": [
+   "Your basket's full and smells like mint and rain. The apothecary pays on the spot."
+  ],
+  "lose": [
+   "Half your basket turns out to be weeds. The apothecary laughs and pays you for the rest."
+  ]
+ },
+ "rooster": {
+  "go": [
+   "Farmer Fenwick waves you over. His prize rooster has escaped again, along with the whole flock."
+  ],
+  "beats": [
+   "The rooster stands on the fence and stares you down like a dragon would.",
+   "You dive for a hen and catch only a mouthful of straw.",
+   "The rooster pecks your {gear}. It leaves a mark. Somehow.",
+   "Fenwick shouts helpful advice from the porch. None of it is helpful.",
+   "You corner the flock behind the barn. They look at you, then at each other.",
+   "You notice the farm is for sale. You file that away."
+  ],
+  "win": [
+   "The last hen goes in the coop. The rooster gives you a look of grudging respect."
+  ],
+  "lose": [
+   "The rooster escapes into the woods. Fenwick pays you for the hens, at least."
   ]
  },
  "rats": {
@@ -76,13 +127,35 @@ const STORY = {
    "Something squeaks in the dark. Then something else squeaks back.",
    "A rat the size of a dog lunges at you. Your {gear} takes the bite.",
    "You find a nest behind the barrels. It's a lot of rats.",
-   "One runs up your leg. You do a little dance nobody needs to see."
+   "One runs up your leg. You do a little dance nobody needs to see.",
+   "Your torch sputters. The squeaking gets closer.",
+   "There's a rat wearing a tiny crown. You decide not to ask."
   ],
   "win": [
-   "The last rat goes down. The cellar is quiet except for your breathing."
+   "The last rat goes down. The cellar is quiet except for your breathing.",
+   "The innkeeper unlocks the door and hands you a mug of ale before you even ask."
   ],
   "lose": [
-   "The rats swarm. You scramble up the stairs with your pride in tatters."
+   "The rats swarm. You scramble up the stairs with your pride in tatters.",
+   "The rat king escapes into the walls. The innkeeper pays you half and sighs."
+  ]
+ },
+ "wolves": {
+  "go": [
+   "You head out to Hollow Fen. A shepherd says the wolves took three sheep this week."
+  ],
+  "beats": [
+   "Howling starts up on all sides. You count at least six voices.",
+   "Tracks in the mud lead deeper into the reeds than you'd like.",
+   "A wolf darts in and bites at your {gear}. Then it's gone again.",
+   "You build a fire and wait. Old trick. Still works.",
+   "The pack leader is huge, gray, and missing an ear. It looks as tired as you."
+  ],
+  "win": [
+   "The pack scatters across the fen and doesn't come back. The shepherd is very grateful."
+  ],
+  "lose": [
+   "The wolves wear you down until you have to fall back. The shepherd pays you for trying."
   ]
  },
  "goblins": {
@@ -93,13 +166,36 @@ const STORY = {
    "A rock bounces off your {gear}. Then twenty more.",
    "A goblin in a cooking-pot helmet yells something rude about your age.",
    "You knock over their stew. They take that personally.",
-   "Their chieftain charges you on a very confused goat."
+   "Their chieftain charges you on a very confused goat.",
+   "A goblin tries to sell you your own boot.",
+   "You find a wanted poster of yourself from twenty years ago. You look great."
   ],
   "win": [
-   "The goblins scatter into the trees, yelling that this isn't over. It's over."
+   "The goblins scatter into the trees, yelling that this isn't over. It's over.",
+   "The chieftain surrenders his goat. You let him keep it."
   ],
   "lose": [
-   "There are way more goblins than the bounty said. You retreat, pelted with rocks the whole way."
+   "There are way more goblins than the bounty said. You retreat, pelted with rocks the whole way.",
+   "The goat headbutts you into a bush. The goblins cheer."
+  ]
+ },
+ "crypt": {
+  "go": [
+   "The priest at Ashby hands you a torch and a bucket of holy water. He doesn't come in."
+  ],
+  "beats": [
+   "The crypt door groans open. Something inside groans back.",
+   "Skeletons climb out of the walls, rattling and clacking.",
+   "A bony hand grabs your {gear}. You shake it off. It keeps shaking.",
+   "You find the grave of an old party member. You stop to pay your respects.",
+   "The holy water works great until you run out of it.",
+   "Candles light themselves one by one down the hall. That's never good."
+  ],
+  "win": [
+   "The last skeleton falls still. The crypt finally goes quiet. The priest blesses you twice."
+  ],
+  "lose": [
+   "The dead are too many and too restless. You back out and bar the door behind you."
   ]
  },
  "escort": {
@@ -110,13 +206,53 @@ const STORY = {
    "Day one passes quietly. Too quietly, says the cook. He says that every day.",
    "A wagon wheel breaks. You spend an hour holding up a wagon.",
    "Bandits on the ridge! Arrows thunk into your {gear}.",
-   "The spice merchant tries to haggle your pay down in the middle of the ambush."
+   "The spice merchant tries to haggle your pay down in the middle of the ambush.",
+   "A sandstorm rolls in. You march with your eyes shut.",
+   "The merchant's kid asks for war stories every night. You tell the good ones."
   ],
   "win": [
-   "The caravan rolls into town with every wagon intact. The merchants are all smiles."
+   "The caravan rolls into town with every wagon intact. The merchants are all smiles.",
+   "The kid gives you a drawing of you fighting the bandits. You keep it."
   ],
   "lose": [
    "The bandits make off with two wagons. The merchants pay you, but only barely."
+  ]
+ },
+ "bridge": {
+  "go": [
+   "Bandits have taken over the bridge at Ferris Crossing and are charging a toll. You go to pay it. With your fists."
+  ],
+  "beats": [
+   "The bandit boss says the toll is five silver. You tell him the toll is now you.",
+   "Two bandits rush you at once. Your {gear} catches a club.",
+   "Someone gets knocked into the river. It isn't you, this time.",
+   "The bandit boss pulls out a crossbow. You pull out thirty years of experience.",
+   "A farmer with a cart waits patiently for the fight to finish."
+  ],
+  "win": [
+   "The bandits jump into the river and swim for it. The farmer crosses for free."
+  ],
+  "lose": [
+   "You end up in the river, soaked and sore. The bandits laugh, but they leave the bridge."
+  ]
+ },
+ "mine": {
+  "go": [
+   "The miners at Copperdeep say the lower tunnels are haunted. Nobody's been down there in weeks."
+  ],
+  "beats": [
+   "Your lantern shows old pickaxes left right where they were dropped.",
+   "Ghostly tapping echoes from deep in the rock.",
+   "A cart rolls toward you on its own. You jump out of the way just in time.",
+   "A pale shape drifts out of the wall and passes right through your {gear}. It's freezing.",
+   "The ghost is an old miner who just wants someone to finish his shift.",
+   "Part of the ceiling collapses behind you. You'll have to find another way out."
+  ],
+  "win": [
+   "You help the ghost finish his last shift, and he finally fades away smiling. The tunnels go quiet."
+  ],
+  "lose": [
+   "The ghost won't be calmed. You run out of lantern oil and feel your way back to daylight."
   ]
  },
  "ogre": {
@@ -127,13 +263,35 @@ const STORY = {
    "You follow huge footprints and a trail of half-eaten cabbages.",
    "The ogre is napping on a pile of flour sacks. He wakes up grumpy.",
    "He swings a whole fence post. Your {gear} takes the hit and groans.",
-   "You find the miller. He's fine, just very annoyed and covered in flour."
+   "You find the miller. He's fine, just very annoyed and covered in flour.",
+   "The ogre sneezes flour all over you. You both stop to cough.",
+   "He picks you up by the ankle. You've been here before. You know what to do."
   ],
   "win": [
-   "The ogre goes down with a thud that rattles every window in Millbrook. The village cheers."
+   "The ogre goes down with a thud that rattles every window in Millbrook. The village cheers.",
+   "The miller bakes you a loaf of bread the size of a shield."
   ],
   "lose": [
    "The ogre tosses you into the millpond. You get the miller out, but the ogre gets away."
+  ]
+ },
+ "troll": {
+  "go": [
+   "You wade into Mirewater. The mud tries to steal your boots with every step."
+  ],
+  "beats": [
+   "The smell hits you before the troll does.",
+   "The troll rises out of the bog, dripping and grinning.",
+   "You cut it. It heals. You cut it again. It heals again.",
+   "Its fist slams into your {gear}. You fly backward into the muck.",
+   "You remember the old rule: fire or acid. You have neither. You improvise.",
+   "Swamp leeches find their way into places leeches should not be."
+  ],
+  "win": [
+   "You trap the troll under a fallen tree and set the whole thing ablaze. It doesn't get back up."
+  ],
+  "lose": [
+   "The troll just won't stay down. You crawl out of the swamp and spend an hour pulling off leeches."
   ]
  },
  "wyvern": {
@@ -144,13 +302,75 @@ const STORY = {
    "A shadow passes overhead. Then it circles back.",
    "The nest is full of eggs, bones, and one very angry parent.",
    "The wyvern's tail slams into your {gear}. Something cracks.",
-   "You hang off a ledge by one hand. Your knees file a formal complaint."
+   "You hang off a ledge by one hand. Your knees file a formal complaint.",
+   "Its poison stinger misses you by an inch. You feel the breeze.",
+   "You find the bones of the last adventurer who tried this. Bad sign."
   ],
   "win": [
    "The wyvern flees into the clouds. You climb down with the loot strapped to your back."
   ],
   "lose": [
    "The wyvern drives you off the cliffs. You slide most of the way down on your backside."
+  ]
+ },
+ "necro": {
+  "go": [
+   "The village of Blackmoor is empty. A man in robes has been raising their dead to plow his fields."
+  ],
+  "beats": [
+   "Zombies in straw hats shamble across the fields. Some of them are actually pretty good at farming.",
+   "The necromancer sees you coming and sighs. He was hoping for a quiet day.",
+   "A wall of bone rises out of the ground. Your {gear} cracks right through it.",
+   "He tries to raise a skeleton dragon. He only gets the tail.",
+   "You realize he's about your age. He tells you he's retiring too, after this harvest.",
+   "Cold magic washes over you. Your bones ache more than usual. A lot more."
+  ],
+  "win": [
+   "The necromancer surrenders and agrees to try regular farming. The dead of Blackmoor lie back down."
+  ],
+  "lose": [
+   "His undead farmhands chase you off the fields. Honestly, they're better farmers than you'll be."
+  ]
+ },
+ "giant": {
+  "go": [
+   "A hill giant has parked himself across the Highpass and won't let anyone through."
+  ],
+  "beats": [
+   "The giant sits on a boulder, picking his teeth with a tree trunk.",
+   "He throws a rock the size of a cottage. You dive behind another rock.",
+   "His foot comes down right next to you. The ground shakes.",
+   "You climb up his leg. He swats at you like a mosquito and catches your {gear}.",
+   "He challenges you to a riddle contest instead. You lose the riddle contest.",
+   "Turns out he just wants someone to talk to. You talk. Then you fight anyway."
+  ],
+  "win": [
+   "The giant topples off the pass and lands with a boom you feel in your teeth. The road is open."
+  ],
+  "lose": [
+   "The giant kicks you all the way back down the mountain path. Merchants still have to go around."
+  ]
+ },
+ "rival": {
+  "go": [
+   "A letter arrives with an old crest on it. Your rival from the old days wants one last duel.",
+   "You head to Dunmore Arena. The crowd is bigger than you expected."
+  ],
+  "beats": [
+   "Your rival steps into the sand. Older, grayer, and still smug.",
+   "He opens with the same move he used thirty years ago. You still remember the counter.",
+   "Steel rings on steel. His blade bites into your {gear}.",
+   "The crowd starts chanting your old nickname. You'd forgotten it. You'd forgotten them.",
+   "You both stop to catch your breath at the same time. Neither of you mentions it.",
+   "He whispers that he's retiring after this too. A vineyard, he says."
+  ],
+  "win": [
+   "You disarm him with your last bit of strength. He laughs, shakes your hand, and invites you to visit the vineyard.",
+   "The crowd roars. Your rival bows to you for the first time in thirty years."
+  ],
+  "lose": [
+   "He knocks you down and offers you a hand up. The crowd still cheers for you anyway.",
+   "You lose, but it's the best fight you've had in years. He buys the drinks after."
   ]
  },
  "drake": {
@@ -163,16 +383,32 @@ const STORY = {
    "Fire rolls over you. The only thing between you and it is your {gear}.",
    "You land a hit that would've made your younger self proud.",
    "Its claws rake across your {gear}. The sound is awful.",
-   "Your lungs burn. Your arms burn. Honestly, everything burns."
+   "Your lungs burn. Your arms burn. Honestly, everything burns.",
+   "It roars so loud the rocks start to fall. You keep your footing. Barely.",
+   "You spot the scar you gave it decades ago. It spots yours."
   ],
   "win": [
-   "The Ashen Drake crashes down the mountain. You sit on a rock for a long time, just breathing."
+   "The Ashen Drake crashes down the mountain. You sit on a rock for a long time, just breathing.",
+   "The drake falls. Below, the whole valley sees the smoke stop rising."
   ],
   "lose": [
    "The drake's fire drives you off the peak. You live, which is more than most can say."
   ]
  }
 };
+// Road beats can show up on any adventure
+const STORY_ROAD = [
+ "Your knee pops on the way up a hill. You pretend it didn't.",
+ "A young adventurer recognizes you and asks you to sign their shield.",
+ "You stop to stretch. It takes longer than it used to.",
+ "You catch yourself thinking about turnips again.",
+ "Your {gear} creaks with every step.",
+ "A bard on the road is singing a song about you. He gets half the details wrong.",
+ "You pass a farm for sale and stare at it a little too long.",
+ "It starts raining. Of course it does.",
+ "You count your coins in your head. Still not enough. Not yet.",
+ "An old tavern sign makes you smile. You got thrown out of there once. Twice, actually."
+];
 const TIER_COLOR = ['var(--r-common)','var(--r-common)','var(--good)','var(--r-rare)','var(--r-rare)','var(--r-epic)','var(--r-legendary)'];
 const TIER_NAME = ['Odd job','Easy','Easy','Medium','Hard','Hard','Deadly'];
 const GEAR_BASES = {weapon:['Cleaver','Longsword','Warhammer','Spear'],armor:['Brigandine','Chainmail','Scale Coat'],shield:['Buckler','Tower Shield','Round Shield'],helm:['Sallet','Coif','Great Helm'],boots:['Greaves','Riding Boots','Sabatons']};
@@ -194,9 +430,15 @@ const ICON = {
   vet:'<circle cx="12" cy="8" r="4"/><path d="M9 10c0 3 1.5 5 3 5s3-2 3-5M4 21c1-4 4-6 8-6s7 2 8 6"/>',
   ration:'<path d="M5 11h14l-2 9H7z"/><path d="M8 11c0-4 8-4 8 0M12 6V3"/>',
   coin:'<circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h4a1.5 1.5 0 010 3h-3a1.5 1.5 0 000 3h4"/>',
+  herb:'<path d="M12 21V10"/><path d="M12 13c-4 0-6-3-6-7 4 0 6 3 6 7zM12 11c0-4 2-7 6-7 0 4-2 7-6 7z"/>',
+  feather:'<path d="M20 4C11 4 6 10 6 18l-2 2"/><path d="M6 18c6 0 11-4 14-14M9 14h5M11 10h5"/>',
+  gem:'<path d="M6 4h12l3 5-9 11L3 9z"/><path d="M3 9h18M9 4l3 16 3-16"/>',
+  horn:'<path d="M4 20c2-8 7-13 16-16-3 5-4 10-10 13z"/><path d="M8 16l2 2M11 13l2 2"/>',
+  skull:'<path d="M5 11a7 7 0 0114 0v4h-2v4H7v-4H5z"/><circle cx="9.5" cy="11.5" r="1.5"/><circle cx="14.5" cy="11.5" r="1.5"/>',
+  medal:'<circle cx="12" cy="15" r="5"/><path d="M8 3l4 7 4-7M12 13v4"/>',
   clock:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>'
 };
-const JOB_ICON = {docks:'crate',rats:'pelt',goblins:'trinket',escort:'sachet',ogre:'tusk',wyvern:'egg',drake:'scale'};
+const JOB_ICON = {docks:"crate",herbs:"herb",rooster:"feather",rats:"pelt",wolves:"pelt",goblins:"trinket",crypt:"gem",escort:"sachet",bridge:"trinket",mine:"gem",ogre:"tusk",troll:"horn",wyvern:"egg",necro:"skull",giant:"gem",rival:"medal",drake:"scale"};
 const ic = (k,cls='')=>'<svg class="ico '+cls+'" viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>';
 
 // ---------- helpers ----------
@@ -308,7 +550,8 @@ function buildScript(j){
   st.go.slice(1).forEach(t=>out.push({at:.08,t}));
   const n=clamp(Math.round(j.secs/9),1,st.beats.length);
   const beats=st.beats.map((t,i)=>({t,i,r:Math.random()})).sort((a,b)=>a.r-b.r).slice(0,n).sort((a,b)=>a.i-b.i).map(b=>b.t); // keep story order
-  beats.forEach((t,i)=>out.push({at:.18+(.62*(i+.5)/n),t}));
+  if(Math.random()<.5) beats.splice(rand(0,beats.length),0,pick(STORY_ROAD));
+  beats.forEach((t,i)=>out.push({at:.18+(.62*(i+.5)/beats.length),t}));
   return out;
 }
 function storyText(t){ const l=live(); return t.replace(/\{gear\}/g,()=>l.length?pick(l).name:'gear'); }
