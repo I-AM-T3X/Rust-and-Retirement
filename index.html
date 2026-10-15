@@ -5,22 +5,26 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Rust &amp; Retirement</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Rubik:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Rust &amp; Retirement</h1>
-      <p class="tag">Thirty years of adventuring. One last stretch of jobs. Wear your gear down to nothing, and walk away with enough coin to buy a farm.</p>
+<div class="app">
+  <header class="panel top" id="top"></header>
+  <main class="cols">
+    <div class="col left">
+      <section class="panel gearp"><div class="phead"><h2>Character</h2><span class="label" id="intact"></span></div><div class="pbody" id="gear"></div></section>
+      <section class="panel bagp"><div class="phead" id="baghead"></div><div class="pbody" id="bag"></div></section>
     </div>
-    <div class="goal" id="goal"></div>
-  </header>
-  <main id="main"></main>
-  <div class="log" aria-live="polite"><div class="label" style="margin-bottom:8px">Journal</div><ol id="log"></ol></div>
-  <footer><button id="newrun" data-a="newrun-ask">Start a new run</button></footer>
+    <div class="col mid">
+      <section class="panel journal"><div class="phead"><h2>Journal</h2><span class="label">Newest first</span></div><div class="pbody"><ol id="log" aria-live="polite"></ol></div></section>
+    </div>
+    <div class="col right">
+      <section class="panel adv"><div class="phead" id="advhead"></div><div class="pbody" id="adv"></div></section>
+    </div>
+  </main>
 </div>
+<div id="end"></div>
 
 <script src="game.js"></script>
 </body>
