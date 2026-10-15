@@ -8,6 +8,13 @@ const CFG = {
   restBonus: 15,
   repairGrowth: 1.6,   // each repair on an item costs 1.6x the last
   bagSize: 18,
+  rerollBase: 50,      // first board reroll each day costs 5 silver
+  rerollGrowth: 2,     // each reroll after that costs 2x the last; resets every morning
+  safeRations: 3,      // eat more than this many rations in one day and you risk a stomach ache
+  fatigueRisk: .05,    // each extra quest in one day adds 5% injury risk
+  healCost: 2000,     // the healer charges 20g to treat one injury (rises with prices)
+  priceStep: .25,      // lodging, food, rations and healing cost 25% more...
+  priceEvery: 10,      // ...every 10 days
   boardSize: 6        // adventures on the board each morning (Haul Crates is always one)
 };
 const LODGING = [
@@ -38,6 +45,51 @@ const RARITY = {
   epic:{label:'Epic',c:'var(--r-epic)',mult:1.3},
   legendary:{label:'Legendary',c:'var(--r-legendary)',mult:1.5}
 };
+// Lasting injuries from failed adventures
+const INJURIES = [
+  {key:'knee',name:'Bad Knee',desc:'-10 max energy',energy:-10,power:0,line:"Your knee twists the wrong way. It's never going to be quite right again."},
+  {key:'back',name:'Thrown-Out Back',desc:'-8 max energy',energy:-8,power:0,line:"Something in your back goes pop. You walk home bent like a question mark."},
+  {key:'ribs',name:'Cracked Ribs',desc:'-6 max energy, -1 power',energy:-6,power:-1,line:"You feel a rib crack. Breathing is a whole project now."},
+  {key:'shoulder',name:'Stiff Shoulder',desc:'-3 power',energy:0,power:-3,line:"Your sword arm won't lift past your ear anymore."},
+  {key:'hand',name:'Shaky Hand',desc:'-2 power',energy:0,power:-2,line:"Your grip trembles now. You hope nobody noticed."},
+  {key:'ear',name:'Ringing Ear',desc:'-2 power',energy:0,power:-2,line:"Your left ear won't stop ringing. You'll never hear the next ambush coming."}
+];
+// Seasons last 12 days each and decide the weather odds. Winter pays more.
+const SEASON_DAYS = 12;
+const SEASONS = [
+  {name:'Spring',w:{clear:3,rain:3,fog:1,wind:2,storm:1}},
+  {name:'Summer',w:{clear:4,heat:3,wind:2,storm:1}},
+  {name:'Autumn',w:{clear:3,rain:2,fog:3,wind:1}},
+  {name:'Winter',pay:1.15,w:{clear:2,snow:4,fog:1,storm:1}}
+];
+const WEATHER = {
+  clear:{name:'Clear skies',desc:'No effects',wear:1,pay:1,energy:1,odds:0},
+  rain:{name:'Rain',desc:'Gear wear +25%',wear:1.25,pay:1,energy:1,odds:0},
+  heat:{name:'Heat wave',desc:'Energy costs +25%',wear:1,pay:1,energy:1.25,odds:0},
+  fog:{name:'Thick fog',desc:'Odds -8%',wear:1,pay:1,energy:1,odds:-.08},
+  wind:{name:'Good road weather',desc:'Energy costs -15%',wear:1,pay:1,energy:.85,odds:0},
+  storm:{name:'Thunderstorm',desc:'Gear wear +40%, pay +15%',wear:1.4,pay:1.15,energy:1,odds:0},
+  snow:{name:'Snow',desc:'Gear wear +25%, pay +20%',wear:1.25,pay:1.2,energy:1,odds:0}
+};
+// Farm savings milestones (copper)
+const MILESTONES = [
+  {at:100000,name:'A plot of land',line:"You could buy a plot of land now. Just dirt and a fence, but it'd be yours."},
+  {at:200000,name:'A little cottage',line:"Enough for a little cottage. You picture a chair by the window."},
+  {at:300000,name:'A red barn',line:"Enough for a barn. Red, obviously."},
+  {at:400000,name:'Two dairy cows',line:"Enough for two dairy cows. You start thinking up names."},
+  {at:500000,name:'The whole farm',line:"Five thousand gold. That's the whole farm. You could retire right now."}
+];
+// Goodbye lines when gear breaks
+const GOODBYE = {
+  'Emberbrand, the Old Flame':"Emberbrand cracks down the middle. Thirty years together. You remember the night you first pulled it from the forge.",
+  'Dented Mithral Hauberk':"The Mithral Hauberk finally splits at the seams. It stopped a lot of arrows that had your name on them.",
+  'Kite Shield of the Third Company':"The Kite Shield of the Third Company splinters. You trace the old company crest one last time.",
+  'Owlcrest Helm':"The Owlcrest Helm caves in. Your old captain gave you that helm. You pry off the owl crest and keep it.",
+  'Road-Worn Boots':"The Road-Worn Boots fall apart. They walked you across half the world. Barefoot it is."
+};
+const GOODBYE_LEGENDARY = "The {name} shatters. Legends don't last forever. Neither do you.";
+const GOODBYE_GENERIC = ["Your {name} gives out. It had a good run.","The {name} breaks. You give it a respectful nod before tossing it.","The {name} is done for. Easy come, easy go."];
+
 // secs = how long the adventure takes. loot = chance of materials, gearDrop = chance of a gear piece (on success)
 const JOBS = [
   {key:"docks",tier:0,name:"Haul Crates",where:"The docks",min:0,secs:10,pay:[200,500],wear:1,energy:20,loot:0.03,gearDrop:0,mat:{name:"Crate of Salted Fish",icon:"crate",v:[300,600]},prefix:""},
@@ -100,6 +152,7 @@ const STORY = {
   ]
  },
  "rooster": {
+  "road": false,
   "go": [
    "Farmer Fenwick waves you over. His prize rooster has escaped again, along with the whole flock."
   ],
@@ -413,6 +466,28 @@ const TIER_COLOR = ['var(--r-common)','var(--r-common)','var(--good)','var(--r-r
 const TIER_NAME = ['Odd job','Easy','Easy','Medium','Hard','Hard','Deadly'];
 const GEAR_BASES = {weapon:['Cleaver','Longsword','Warhammer','Spear'],armor:['Brigandine','Chainmail','Scale Coat'],shield:['Buckler','Tower Shield','Round Shield'],helm:['Sallet','Coif','Great Helm'],boots:['Greaves','Riding Boots','Sabatons']};
 const KEY = 'rust-retirement-v2';
+const HKEY = 'rust-retirement-history';
+function loadHist(){ try{ const h=JSON.parse(localStorage.getItem(HKEY)||'[]'); return Array.isArray(h)?h:[]; }catch(e){ return []; } }
+function saveHist(h){ try{ localStorage.setItem(HKEY,JSON.stringify(h)); }catch(e){} }
+
+// ---------- sound (synthesized, no files) ----------
+let AC=null, muted=false;
+try{ muted=localStorage.getItem('rr-muted')==='1'; }catch(e){}
+function ac(){ if(typeof window==='undefined') return null; if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } } if(AC.state==='suspended') AC.resume(); return AC; }
+function tone(f,t0,d,type,vol,f2){ const a=AC, t=a.currentTime+t0, o=a.createOscillator(), g=a.createGain(); o.type=type||'sine'; o.frequency.setValueAtTime(f,t); if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+d); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol||.1,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+d); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+d+.05); }
+function noise(t0,d,vol){ const a=AC, n=Math.floor(a.sampleRate*d), b=a.createBuffer(1,n,a.sampleRate), ch=b.getChannelData(0); for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*(1-i/n); const src=a.createBufferSource(), g=a.createGain(); g.gain.value=vol||.15; src.buffer=b; src.connect(g); g.connect(a.destination); src.start(a.currentTime+t0); }
+const SFX = {
+  setout:()=>{ tone(330,0,.12,'triangle',.1); tone(440,.1,.18,'triangle',.1); },
+  win:()=>{ [523,659,784,1047].forEach((f,i)=>tone(f,i*.09,.25,'triangle',.09)); },
+  lose:()=>{ tone(300,0,.25,'sawtooth',.05,180); tone(200,.2,.35,'sawtooth',.05,110); },
+  loot:()=>{ [1200,1600,2000].forEach((f,i)=>tone(f,i*.06,.15,'sine',.06)); },
+  break:()=>{ noise(0,.25,.18); tone(120,0,.3,'square',.06,60); },
+  coin:()=>{ tone(1400,0,.08,'square',.04); tone(1900,.06,.12,'square',.04); },
+  injury:()=>{ tone(90,0,.4,'sine',.25,50); },
+  milestone:()=>{ [392,523,659,784].forEach((f,i)=>tone(f,i*.12,.4,'triangle',.09)); tone(1047,.5,.6,'triangle',.09); },
+  click:()=>{ tone(660,0,.05,'square',.03); }
+};
+function sfx(n){ if(muted) return; const a=ac(); if(!a) return; try{ SFX[n]&&SFX[n](); }catch(e){} }
 
 const ICON = {
   weapon:'<path d="M19 5l-9.5 9.5M19 5h-3.5M19 5v3.5M9.5 14.5l-2 2M5.5 14.5l4 4M4 20l2.2-2.2"/>',
@@ -454,15 +529,31 @@ function fmt(cp,short){
   return '<span class="num">'+out.join(' ')+'</span>';
 }
 const plain = cp => fmt(cp).replace(/<[^>]+>/g,'');
+const gShort = cp => cp>=100 ? '<span class="num">'+Math.floor(cp/100).toLocaleString()+'<i class="gp">g</i></span>' : fmt(cp);
 const esc = s => String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 const job = k => JOBS.find(j=>j.key===k);
+const season = ()=>SEASONS[Math.floor((S.day-1)/SEASON_DAYS)%SEASONS.length];
+const weather = ()=>WEATHER[S.weather]||WEATHER.clear;
+function wx(){ const w=weather(), sn=season(); return {wear:w.wear, pay:w.pay*(sn.pay||1), energy:w.energy, odds:w.odds}; }
+function rollWeather(){ const w=season().w; let tot=0; for(const k in w) tot+=w[k]; let r=Math.random()*tot; for(const k in w){ r-=w[k]; if(r<0) return k; } return 'clear'; }
+const priceMult = ()=>1+CFG.priceStep*Math.floor((S.day-1)/CFG.priceEvery);
+const upkeep = c=>Math.round(c*priceMult());
+const healCost = ()=>upkeep(CFG.healCost);
+const injuries = ()=>(S.injuries||[]).map(k=>INJURIES.find(i=>i.key===k)).filter(Boolean);
+const maxE = ()=>Math.max(40,100+injuries().reduce((a,i)=>a+i.energy,0));
+const jobEnergy = j=>Math.round(j.energy*wx().energy);
+const jobWear = j=>Math.round(j.wear*wx().wear);
+const jobPay = j=>[Math.round(j.pay[0]*wx().pay),Math.round(j.pay[1]*wx().pay)];
+function rollMarket(){ S.market={}; JOBS.forEach(j=>{ S.market[j.mat.name]=Math.round((.6+Math.random()*.9)*100)/100; }); }
+const marketMult = n=>(S.market&&S.market[n])||1;
+function goodbye(g){ return (GOODBYE[g.name] || (g.rarity==='legendary'?GOODBYE_LEGENDARY:pick(GOODBYE_GENERIC))).replace(/\{name\}/g,g.name); }
 
 // ---------- state ----------
 let S;
 function newState(){
   const s={day:1, phase:'morning', gold:CFG.startGold, energy:100, rations:2, nextId:1,
     eq:{}, bag:[], offers:[], event:null, trip:null, lodge:'inn', meal:'plate',
-    selSlot:'weapon', selBag:null, pendingSell:null, askNew:false, log:[], ended:false, endReason:''};
+    injuries:[], ms:-1, selSlot:'weapon', selBag:null, pendingSell:null, askNew:false, log:[], ended:false, endReason:''};
   START_GEAR.forEach(g=>{ s.eq[g.slot]={...g, uid:s.nextId++, kind:'gear', dur:g.max, repairs:0}; });
   return s;
 }
@@ -472,20 +563,22 @@ function log(text,kind=''){ S.log.unshift({d:S.day,text,kind}); S.log=S.log.slic
 
 const live = ()=>SLOTS.map(k=>S.eq[k]).filter(g=>g&&g.dur>0);
 function gearPower(g){ if(!g||g.dur<=0) return 0; return g.dur/g.max<.25 ? g.power/2 : g.power; }
-const power = ()=>Math.round(SLOTS.reduce((a,k)=>a+gearPower(S.eq[k]),0));
+const power = ()=>Math.max(0,Math.round(SLOTS.reduce((a,k)=>a+gearPower(S.eq[k]),0)+injuries().reduce((a,i)=>a+i.power,0)));
 const repairCost = g=>Math.round(g.repairBase*Math.pow(CFG.repairGrowth,g.repairs));
 function sellValue(it){
-  if(it.kind==='mat') return it.value;
+  if(it.kind==='mat') return Math.round(it.value*marketMult(it.name));
   if(it.dur<=0) return Math.round(it.sell*.1);
   const r=it.dur/it.max;
   return Math.round(it.sell*(it.rarity==='legendary'?.6+.4*r:.4+.6*r));
 }
+const rerollCost = ()=>Math.round(CFG.rerollBase*Math.pow(CFG.rerollGrowth,S.rerolls||0));
 const inTown = ()=>!S.trip && !S.ended;
 function chance(j){
   const p=power(); if(p<j.min) return 0;
-  let c=.88+(p-j.min)*.008+(S.energy-60)*.004;
-  if(S.energy<j.energy) c*=.5;
-  return clamp(c,.1,.98);
+  let c=clamp(.88+(p-j.min)*.008+(S.energy-60)*.004,.1,.98);
+  c=c+wx().odds;                          // weather is applied after the cap so fog always shows on the cards
+  if(S.energy<jobEnergy(j)) c*=.5;
+  return clamp(c,.05,.98);
 }
 function score(){
   const g=clamp(S.gold/CFG.goal,0,1), l=clamp(S.day/CFG.targetDays,0,1);
@@ -507,13 +600,23 @@ function addToBag(it){
   S.bag.push(it); return true;
 }
 
+function replaceOffer(key){
+  const i=S.offers.indexOf(key); if(i<0) return;
+  const pool=JOBS.filter(j=>!S.offers.includes(j.key) && !(S.doneToday||[]).includes(j.key));
+  if(pool.length) S.offers[i]=pick(pool).key; else S.offers.splice(i,1);
+  S.offers.sort((a,b)=>job(a).min-job(b).min);
+}
 function rollOffers(){
   const pool=JOBS.slice(1).sort(()=>Math.random()-.5).slice(0,CFG.boardSize-1);
   S.offers=[JOBS[0].key,...pool.map(j=>j.key)].sort((a,b)=>job(a).min-job(b).min);
 }
 function startDay(){
+  S.weather=rollWeather(); rollMarket();
+  if(S.day>1 && (S.day-1)%SEASON_DAYS===0) log(season().name+' arrives.'+(season().pay?' Folks pay more for help in the cold.':''),'story');
+  if(S.day>1 && (S.day-1)%CFG.priceEvery===0) log('Prices around town went up again. Lodging, food, rations, and the healer now cost '+Math.round((priceMult()-1)*100)+'% more than when you started.','bad');
+  log('Weather: '+weather().name+'. '+weather().desc+'.');
   rollOffers();
-  S.event=null; S.pendingSell=null;
+  S.rerolls=0; S.questsToday=0; S.doneToday=[]; S.rationsToday=0; S.event=null; S.pendingSell=null;
   if(S.day>1 && Math.random()<.28){
     const roll=Math.random(), intact=live();
     if(roll<.4 && intact.length){
@@ -522,22 +625,24 @@ function startDay(){
     } else if(roll<.6){
       const c=rand(1000,3000); S.gold+=c; log('You find a forgotten coin pouch in your pack: '+plain(c)+'.','good');
     } else if(roll<.8){
-      S.energy=clamp(S.energy-15,0,100); log('Your knee is acting up this morning. Energy -15.','bad');
+      S.energy=clamp(S.energy-15,0,maxE()); log('Your knee is acting up this morning. Energy -15.','bad');
     } else {
-      S.energy=clamp(S.energy+10,0,100); log('An old party member spots you and buys breakfast. Energy +10.','good');
+      S.energy=clamp(S.energy+10,0,maxE()); log('An old party member spots you and buys breakfast. Energy +10.','good');
     }
   }
 }
 function applyWear(total){
   const l=live(); if(!l.length||total<=0) return [];
   const w=l.map(g=>WEAR_WEIGHT[g.slot]*(.7+Math.random()*.6)), sum=w.reduce((a,b)=>a+b,0), broke=[];
-  l.forEach((g,i)=>{ const d=Math.max(total>=5?1:0,Math.round(total*w[i]/sum)); g.dur=Math.max(0,g.dur-d); if(g.dur===0) broke.push(g.name); });
+  l.forEach((g,i)=>{ const d=Math.max(total>=5?1:0,Math.round(total*w[i]/sum)); g.dur=Math.max(0,g.dur-d); if(g.dur===0) broke.push(g); });
   return broke;
 }
 function endGame(reason){
   let v=0; S.bag.forEach(i=>v+=sellValue(i));
   if(v){ S.gold+=v; log('You sell off everything left in your bag for '+plain(v)+'.','good'); }
   S.bag=[]; S.ended=true; S.endReason=reason; S.trip=null;
+  const sc=score(), hist=loadHist(), rec={when:Date.now(), stars:sc.stars, gold:S.gold, days:S.day, name:plainName(S.name)||'The Old Veteran'};
+  hist.push(rec); saveHist(hist.slice(-50)); S.runWhen=rec.when;
 }
 function checkEnd(){
   if(!live().length && !S.bag.some(i=>i.kind==='gear'&&i.dur>0)){
@@ -545,12 +650,28 @@ function checkEnd(){
     endGame('Your last piece of gear gave out. Time to hang it all up.');
   }
 }
+function maybeInjure(j,ok){
+  if(!S.injuries) S.injuries=[];
+  const pool=INJURIES.filter(i=>!S.injuries.includes(i.key));
+  const f=Math.max(0,(S.questsToday||1)-1);  // every extra quest in one day raises the risk
+  const risk=ok ? .012*j.tier+CFG.fatigueRisk*f : .15+.03*j.tier+CFG.fatigueRisk*1.5*f;
+  if(!pool.length || Math.random()>=risk) return;
+  const inj=pick(pool); S.injuries.push(inj.key); S.energy=Math.min(S.energy,maxE());
+  log(inj.line,'story'); log('Injury: '+inj.name+' ('+inj.desc+'). A healer can treat it.','bad'); sfx('injury');
+}
+function checkMilestones(){
+  if(S.ms===undefined) S.ms=-1;
+  while(S.ms+1<MILESTONES.length && S.gold>=MILESTONES[S.ms+1].at){
+    S.ms++; const m=MILESTONES[S.ms];
+    log('Farm milestone: '+m.name+'. '+m.line,'milestone'); sfx('milestone');
+  }
+}
 function buildScript(j){
   const st=STORY[j.key], out=[];
   st.go.slice(1).forEach(t=>out.push({at:.08,t}));
   const n=clamp(Math.round(j.secs/9),1,st.beats.length);
   const beats=st.beats.map((t,i)=>({t,i,r:Math.random()})).sort((a,b)=>a.r-b.r).slice(0,n).sort((a,b)=>a.i-b.i).map(b=>b.t); // keep story order
-  if(Math.random()<.5) beats.splice(rand(0,beats.length),0,pick(STORY_ROAD));
+  if(st.road!==false && Math.random()<.5) beats.unshift(pick(STORY_ROAD)); // road beats happen on the way there
   beats.forEach((t,i)=>out.push({at:.18+(.62*(i+.5)/beats.length),t}));
   return out;
 }
@@ -558,38 +679,65 @@ function storyText(t){ const l=live(); return t.replace(/\{gear\}/g,()=>l.length
 function resolveTrip(){
   const t=S.trip, j=job(t.key), ok=t.ok!==undefined?t.ok:Math.random()<t.c;
   log(pick(STORY[j.key][ok?'win':'lose']),'story');
-  let pay=rand(j.pay[0],j.pay[1]), wear=j.wear;
+  const pr=jobPay(j); let pay=rand(pr[0],pr[1]), wear=jobWear(j);
   if(!ok){ pay=Math.round(pay*.25); wear=Math.round(wear*1.5); }
   S.gold+=pay;
   const broke=applyWear(wear);
   log((ok?'Success at ':'It went badly at ')+j.name+'. Earned '+plain(pay)+'.',ok?'good':'bad');
-  broke.forEach(n=>log(n+' breaks.','bad'));
+  sfx(ok?'win':'lose');
+  broke.forEach(g=>{ log(g.name+' breaks.','bad'); log(goodbye(g),'story'); });
+  if(broke.length) setTimeout(()=>sfx('break'),350);
+  maybeInjure(j,ok);
   if(Math.random()<(ok?j.loot:j.loot*.3)){
     const it={uid:S.nextId++, kind:'mat', name:j.mat.name, icon:j.mat.icon, rarity:'common', value:rand(j.mat.v[0],j.mat.v[1])};
-    if(addToBag(it)) log('Loot: '+it.name+' (worth '+plain(it.value)+').','loot');
+    if(addToBag(it)){ log('Loot: '+it.name+' (usually worth '+plain(it.value)+').','loot'); sfx('loot'); }
   }
   if(ok && Math.random()<j.gearDrop){
     const g=genGear(j);
-    if(addToBag(g)) log('Loot: '+RARITY[g.rarity].label+' '+g.name+' ('+g.power+' power).','loot');
+    if(addToBag(g)){ log('Loot: '+RARITY[g.rarity].label+' '+g.name+' ('+g.power+' power).','loot'); sfx('loot'); }
   }
-  S.trip=null; S.phase='evening';
+  S.trip=null; // stay out: you can keep questing while you have energy, or end the day
+  replaceOffer(t.key);
   checkEnd();
 }
 
 // ---------- actions ----------
 const A = {
   job(key){
-    const j=job(key), c=chance(j); if(!c||!inTown()||S.phase!=='morning') return;
-    S.energy=clamp(S.energy-j.energy,0,100);
+    const j=job(key), c=chance(j); if(!c||!inTown()||S.phase!=='morning'||(S.doneToday||[]).includes(key)) return;
+    S.questsToday=(S.questsToday||0)+1; (S.doneToday||(S.doneToday=[])).push(key);
+    S.energy=clamp(S.energy-jobEnergy(j),0,maxE());
     S.trip={key, start:Date.now(), dur:j.secs*1000, c, ok:Math.random()<c, script:buildScript(j), next:0};
     S.event=null; S.pendingSell=null;
     S.trip.beat=STORY[j.key].go[0];
-    log(S.trip.beat,'story');
+    log(S.trip.beat,'story'); sfx('setout');
   },
-  rest(){ if(!inTown()) return; S.energy=clamp(S.energy+CFG.restBonus,0,100); log('You take the day off. Energy +'+CFG.restBonus+'.'); S.phase='evening'; },
-  buyRation(n){ n=+n||1; const c=CFG.rationCost*n; if(S.gold<c||S.ended) return; S.gold-=c; S.rations+=n; },
+  reroll(){
+    const c=rerollCost(); if(!inTown()||S.phase!=='morning'||S.gold<c) return;
+    S.gold-=c; S.rerolls=(S.rerolls||0)+1; rollOffers();
+    log('You pay '+plain(c)+' to hear about some other jobs. Next look costs '+plain(rerollCost())+'.');
+  },
+  rest(){ if(!inTown()||S.phase!=='morning'||S.questsToday) return; S.energy=clamp(S.energy+CFG.restBonus,0,maxE()); log('You take the day off. Energy +'+CFG.restBonus+'.'); S.phase='evening'; },
+  endDay(){ if(!inTown()||S.phase!=='morning') return; S.phase='evening'; log('You call it a day and head back into town.'); },
+  buyRation(n){ n=+n||1; const c=upkeep(CFG.rationCost)*n; if(S.gold<c||S.ended) return; S.gold-=c; S.rations+=n; },
   tab(t){ S.bagTab=t; },
-  eatRation(){ if(!S.rations||S.energy>=100||S.ended) return; S.rations--; S.energy=clamp(S.energy+CFG.rationEnergy,0,100); },
+  heal(key){
+    const cost=healCost(), i=(S.injuries||[]).indexOf(key); if(!inTown()||i<0||S.gold<cost) return;
+    const inj=INJURIES.find(x=>x.key===key); S.gold-=cost; S.injuries.splice(i,1);
+    log('The healer treats your '+inj.name.toLowerCase()+' for '+plain(cost)+'. Good as new. Mostly.','good'); sfx('coin');
+  },
+  mute(){ muted=!muted; try{ localStorage.setItem('rr-muted',muted?'1':'0'); }catch(e){} if(!muted) sfx('click'); },
+  eatRation(){
+    if(!S.rations||S.energy>=maxE()||S.ended||S.stomach) return;
+    S.rations--; S.energy=clamp(S.energy+CFG.rationEnergy,0,maxE());
+    S.rationsToday=(S.rationsToday||0)+1;
+    const over=S.rationsToday-CFG.safeRations;
+    if(over>0 && !S.stomach && Math.random()<.25*over){
+      S.stomach=true;
+      log('Your stomach starts to churn. That was one ration too many.','story');
+      log('Injury: Stomach Ache. You\'ll wake up tomorrow with half your energy.','bad'); sfx('injury');
+    }
+  },
   selSlot(k){ S.selSlot=k; S.pendingSell=null; },
   selBag(uid){ S.selBag=+uid; S.pendingSell=null; },
   repair(){
@@ -603,17 +751,17 @@ const A = {
   sellEq(){
     const g=S.eq[S.selSlot]; if(!g||!inTown()) return;
     const v=sellValue(g); S.gold+=v; S.eq[S.selSlot]=null; S.pendingSell=null;
-    log('Sold '+g.name+' for '+plain(v)+'.','good'); checkEnd();
+    log('Sold '+g.name+' for '+plain(v)+'.','good'); sfx('coin'); checkEnd();
   },
   sellBag(){
     const i=S.bag.findIndex(x=>x.uid===S.selBag); if(i<0||!inTown()) return;
     const it=S.bag[i], v=sellValue(it); S.gold+=v; S.bag.splice(i,1); S.selBag=null;
-    log('Sold '+it.name+' for '+plain(v)+'.','good'); checkEnd();
+    log('Sold '+it.name+' for '+plain(v)+'.','good'); sfx('coin'); checkEnd();
   },
   sellMats(){
     if(!inTown()) return; let v=0,n=0;
-    S.bag=S.bag.filter(it=>{ if(it.kind==='mat'){v+=it.value;n++;return false} return true; });
-    if(n){ S.gold+=v; log('The merchant buys '+n+' material'+(n>1?'s':'')+' for '+plain(v)+'.','good'); }
+    S.bag=S.bag.filter(it=>{ if(it.kind==='mat'){v+=sellValue(it);n++;return false} return true; });
+    if(n){ S.gold+=v; log('The merchant buys '+n+' material'+(n>1?'s':'')+' for '+plain(v)+'.','good'); sfx('coin'); }
     S.selBag=null;
   },
   equip(){
@@ -628,33 +776,52 @@ const A = {
   merchantYes(){
     const e=S.event, g=S.eq[e.slot]; if(!g) return;
     S.gold+=e.offer; S.eq[e.slot]=null; S.event=null;
-    log('A traveling merchant buys '+g.name+' for '+plain(e.offer)+'.','good'); checkEnd();
+    log('A traveling merchant buys '+g.name+' for '+plain(e.offer)+'.','good'); sfx('coin'); checkEnd();
   },
   merchantNo(){ log('You send the merchant on his way.'); S.event=null; },
   sleep(){
-    const L=LODGING.find(x=>x.key===S.lodge), M=MEALS.find(x=>x.key===S.meal), cost=L.cost+M.cost;
+    const L=LODGING.find(x=>x.key===S.lodge), M=MEALS.find(x=>x.key===mealKey()), cost=upkeep(L.cost)+upkeep(M.cost);
     if(S.gold<cost||S.phase!=='evening') return;
-    S.gold-=cost; S.energy=clamp(S.energy+L.energy+M.energy,0,100);
+    S.gold-=cost; S.energy=clamp(S.energy+L.energy+M.energy,0,maxE());
+    if(S.stomach){ S.energy=Math.floor(S.energy/2); S.stomach=false; S.stomachHit=true; }
     log('Night '+S.day+': '+L.name.toLowerCase()+', '+M.name.toLowerCase()+'. Spent '+plain(cost)+'.');
     S.day++; S.phase='morning'; startDay();
+    if(S.stomachHit){ S.stomachHit=false; log('You spent half the night clutching your stomach. You wake up with only '+S.energy+' energy.','bad'); }
   },
   retire(){ if(S.trip) return; log('You retire on your own terms.','good'); endGame('You decide you\'ve had enough and walk away while you still can.'); },
   'newrun-ask'(){ S.askNew=true; },
   'newrun-no'(){ S.askNew=false; },
-  newrun(){ S=newState(); startDay(); log('Day one of the last stretch. Five thousand gold buys a farm.'); }
+  newrun(){ const last=S&&S.name; S=newState(); S.started=false; S.draftName=last||''; startDay(); },
+  begin(){
+    if(S.started) return;
+    const el=document.getElementById('hero-name'), v=(el&&el.value||S.draftName||'').trim().replace(/\s+/g,' ').slice(0,24);
+    S.name=plainName(v); S.started=true; delete S.draftName;
+    log(heroName()+(S.name?',':'')+' starts the last stretch. Five thousand gold buys a farm.','story'); sfx('setout');
+  },
 };
 
 // ---------- render ----------
 function starsHTML(v,cls){ return '<span class="'+cls+'" style="--f:'+(v/5*100)+'%" role="img" aria-label="'+v+' out of 5 stars"><span class="base">★★★★★</span><span class="fill">★★★★★</span></span>'; }
-function phaseLabel(){ if(S.trip) return 'On the road'; return S.phase==='morning'?'Morning':'Evening'; }
+function wxNote(){
+  const fx=[]; if(weather().desc!=='No effects') fx.push(weather().desc.toLowerCase());
+  if(season().pay) fx.push('winter pay +15%');
+  if(priceMult()>1) fx.push('town prices +'+Math.round((priceMult()-1)*100)+'%');
+  return fx.length?fx.join(', '):'no effects';
+}
+const mealKey = ()=>S.stomach?'skip':S.meal;
+const TITLE = 'the Old Veteran';
+const plainName = n=>{ n=(n||'').trim(); return n && n.toLowerCase()!=='the old veteran' ? n : ''; };
+const titleFor = n=>plainName(n) ? plainName(n)+', '+TITLE : 'The Old Veteran';
+const heroName = ()=>titleFor(S.name);
+function phaseLabel(){ if(S.trip) return 'On the road'; if(S.phase!=='morning') return 'Evening'; return S.questsToday?'Afternoon':'Morning'; }
 
 function renderTop(){
-  const pct=clamp(S.gold/CFG.goal*100,0,100), sc=score(), lowE=S.energy<30;
+  const pct=clamp(S.gold/CFG.goal*100,0,maxE()), sc=score(), lowE=S.energy<30;
   document.getElementById('top').innerHTML=
     '<div class="who"><div class="avatar">'+ic('vet')+'</div><div style="flex:1;min-width:0">'+
-      '<h1>The Old Veteran</h1><div class="sub">Retiring adventurer · Day '+S.day+' · '+phaseLabel()+'</div>'+
-      '<div class="bars"><div class="bar fund" title="Retirement fund"><span style="width:'+pct+'%"></span></div><span class="num">'+Math.floor(S.gold/100).toLocaleString()+' / '+(CFG.goal/100).toLocaleString()+'g</span>'+
-      '<div class="bar energy '+(lowE?'low':'')+'" title="Energy"><span style="width:'+S.energy+'%"></span></div><span class="num">'+S.energy+' / 100</span></div>'+
+      '<h1 title="'+esc(heroName())+'">'+esc(heroName())+'</h1><div class="sub">Day '+S.day+' · '+phaseLabel()+(S.questsToday?' · '+S.questsToday+' quest'+(S.questsToday>1?'s':'')+' today':'')+'</div>'+
+      '<div class="bars"><div class="bar fund" title="Retirement fund. Notches mark farm milestones."><span style="width:'+pct+'%"></span>'+MILESTONES.slice(0,-1).map(m=>'<i class="tick'+(S.gold>=m.at?' on':'')+'" style="left:'+(m.at/CFG.goal*100)+'%"></i>').join('')+'</div><span class="num">'+Math.floor(S.gold/100).toLocaleString()+' / '+(CFG.goal/100).toLocaleString()+'g</span>'+
+      '<div class="bar energy '+(lowE?'low':'')+'" title="Energy"><span style="width:'+S.energy+'%"></span></div><span class="num">'+S.energy+' / '+maxE()+'</span></div>'+
     '</div></div>'+
     '<div class="hstats">'+
       '<div class="tile"><span class="label">Purse</span><b>'+fmt(S.gold,true)+'</b></div>'+
@@ -662,7 +829,7 @@ function renderTop(){
       '<div class="tile"><span class="label">Rating so far</span>'+starsHTML(sc.stars,'mini-stars')+'</div>'+
       '<div class="hbtns">'+(S.askNew
         ? '<button class="confirm" data-a="newrun">Yes, start over</button><button data-a="newrun-no">Keep playing</button>'
-        : '<button data-a="retire" '+(S.trip||S.ended?'disabled':'')+'>Retire now</button><button data-a="newrun-ask">New run</button>')+'</div>'+
+        : '<button data-a="mute" title="Sound effects">'+(muted?'Sound off':'Sound on')+'</button><button data-a="retire" '+(S.trip||S.ended?'disabled':'')+'>Retire now</button><button data-a="newrun-ask">New run</button>')+'</div>'+
     '</div>';
 }
 
@@ -676,27 +843,32 @@ function slotHTML(k){
 
 function renderGear(){
   document.getElementById('intact').textContent=live().length+' of 5 intact';
-  const sc=score();
+  const nextM=MILESTONES[(S.ms===undefined?-1:S.ms)+1];
   let h='<div class="doll"><div class="slots">'+['helm','armor','boots'].map(slotHTML).join('')+'</div>'+
-    '<div class="center"><div class="cstat hero"><span class="label">Combat power</span><b>'+power()+'</b></div>'+
-    '<div class="cstat"><span class="label">Energy</span><b>'+S.energy+'</b></div>'+
-    '<div class="cstat"><span class="label">Days on the road</span><b>'+S.day+'</b></div></div>'+
+    '<div class="center"><div class="cstat hero"><span class="label">Power</span><b>'+power()+'</b></div>'+
+    '<div class="cstat"><span class="label">Energy</span><b>'+S.energy+'<small>/'+maxE()+'</small></b></div>'+
+    '<div class="cstat"><span class="label">Next goal'+(nextM?' · '+Math.floor(nextM.at/100).toLocaleString()+'g':'')+'</span><b class="farmnext">'+(nextM?esc(nextM.name):'All saved up')+'</b></div></div>'+
     '<div class="slots">'+['weapon','shield'].map(slotHTML).join('')+'</div></div>';
   const g=S.eq[S.selSlot];
   if(!g){
-    h+='<div class="detail"><div class="nm">'+SLOT_NAME[S.selSlot]+' slot</div><p class="empty-note">Nothing equipped here. Pick up gear on adventures and equip it from your bag.</p></div>';
+    h+='<div class="detail"><div class="dtop"><span class="nm">'+SLOT_NAME[S.selSlot]+' slot</span><span class="dsub">Empty</span></div><p class="empty-note">Equip something from your bag.</p></div>';
   } else {
     const r=g.dur/g.max, dc=r<.25?'low':r<.5?'mid':'', rc=repairCost(g);
     let state=g.dur<=0?' · <span style="color:var(--bad)">Broken</span>':r<.25?' · <span style="color:var(--gold)">Worn, half power</span>':'';
-    h+='<div class="detail"><div class="nm" style="color:'+RARITY[g.rarity].c+'">'+esc(g.name)+'</div>'+
-      '<div class="meta"><span>'+SLOT_NAME[g.slot]+' · '+RARITY[g.rarity].label+state+'</span></div>'+
-      '<div class="meta"><span>Power <b>'+g.power+'</b></span><span>Repairs <b>'+g.repairs+'</b></span><span>Worth <b>'+fmt(sellValue(g),true)+'</b></span></div>'+
-      '<div class="durrow '+dc+'"><div class="bar"><span style="width:'+r*100+'%"></span></div><span class="num">'+g.dur+'/'+g.max+'</span></div>'+
+    h+='<div class="detail"><div class="dtop"><span class="nm" style="color:'+RARITY[g.rarity].c+'" title="'+esc(g.name)+'">'+esc(g.name)+'</span><span class="dsub">'+RARITY[g.rarity].label+'</span></div>'+
+      '<div class="meta"><span>Power <b>'+g.power+'</b></span><span>Repairs <b>'+g.repairs+'</b></span><span>Worth <b>'+fmt(sellValue(g),true)+'</b></span>'+state.replace(' · ','')+'</div>'+
+      '<div class="drow"><div class="durrow '+dc+'"><div class="bar"><span style="width:'+r*100+'%"></span></div><span class="num">'+g.dur+'/'+g.max+'</span></div>'+
       '<div class="acts">'+(S.pendingSell==='eq'
         ? '<button class="confirm" data-a="sellEq">Sell for '+plain(sellValue(g))+'</button><button data-a="sellCancel">Keep it</button>'
         : '<button data-a="repair" '+(!inTown()||g.dur>=g.max||S.gold<rc?'disabled':'')+'>Repair · '+fmt(rc,true)+'</button><button class="danger" data-a="sellAsk" '+(!inTown()?'disabled':'')+'>Sell…</button>')+
-      '</div></div>';
+      '</div></div></div>';
   }
+  const inj=injuries();
+  const stom=S.stomach?'<div class="inj" title="Too many rations today. You\'ll wake up with half your energy."><span><b>Stomach Ache</b><small>half energy tomorrow</small></span></div>':'';
+  h+='<div class="injuries">'+stom+(inj.length
+    ? inj.map(i=>'<div class="inj" title="'+esc(i.name+': '+i.desc)+'"><span><b>'+esc(i.name)+'</b><small>'+esc(i.desc.replace(' max energy',' energy'))+'</small></span><button data-a="heal" data-id="'+i.key+'" title="See the healer for '+plain(healCost())+'" '+(!inTown()||S.gold<healCost()?'disabled':'')+'>Heal</button></div>').join('')
+    : (stom?'':'<div class="inj-none"><span class="label">Injuries</span><span class="empty-note">None yet</span></div>'))+'</div>';
+  h+='<div class="wxcard" title="Weather changes every morning"><span class="label">'+season().name+'</span><b>'+esc(weather().name)+'</b><span>'+esc(wxNote())+'</span></div>';
   document.getElementById('gear').innerHTML=h;
 }
 
@@ -718,33 +890,39 @@ function renderAdv(){
     tick(); return;
   }
   if(S.phase==='evening'){
-    head.innerHTML='<h2>Back in town</h2><span class="label">Evening, day '+S.day+'</span>';
-    const opt=(name,list,cur)=>list.map(o=>'<label class="opt"><input type="radio" id="'+name+'-'+o.key+'" name="'+name+'" value="'+o.key+'" '+(o.key===cur?'checked':'')+'>'+
-      '<span class="grow"><b>'+esc(o.name)+'</b><small>'+esc(o.note)+' · +'+o.energy+'</small></span><span>'+(o.cost?fmt(o.cost):'<span class="num" style="color:var(--muted)">free</span>')+'</span></label>').join('');
-    const L=LODGING.find(x=>x.key===S.lodge), M=MEALS.find(x=>x.key===S.meal), cost=L.cost+M.cost, after=clamp(S.energy+L.energy+M.energy,0,100);
+    head.innerHTML='<h2>Back in town</h2><span class="label">Evening, day '+S.day+(priceMult()>1?' · prices +'+Math.round((priceMult()-1)*100)+'%':'')+'</span>';
+    const opt=(name,list,cur,off)=>list.map(o=>'<label class="opt'+(off&&off(o)?' off':'')+'"><input type="radio" id="'+name+'-'+o.key+'" name="'+name+'" value="'+o.key+'" '+(o.key===cur?'checked':'')+(off&&off(o)?' disabled':'')+'>'+
+      '<span class="grow"><b>'+esc(o.name)+'</b><small>'+esc(o.note)+' · +'+o.energy+'</small></span><span>'+(o.cost?fmt(upkeep(o.cost)):'<span class="num" style="color:var(--muted)">free</span>')+'</span></label>').join('');
+    const L=LODGING.find(x=>x.key===S.lodge), M=MEALS.find(x=>x.key===mealKey()), cost=upkeep(L.cost)+upkeep(M.cost), full=clamp(S.energy+L.energy+M.energy,0,maxE()), after=S.stomach?Math.floor(full/2):full;
     body.innerHTML='<div class="eve"><fieldset><legend class="label">Lodging</legend>'+opt('lodge',LODGING,S.lodge)+'</fieldset>'+
-      '<fieldset><legend class="label">Supper</legend>'+opt('meal',MEALS,S.meal)+'</fieldset></div>'+
-      '<div class="sleepbar"><span>Tonight costs '+fmt(cost)+' · wake with <b class="num">'+after+'</b> energy</span>'+
+      '<fieldset><legend class="label">Supper</legend>'+opt('meal',MEALS,mealKey(),S.stomach?o=>o.key!=='skip':null)+(S.stomach?'<p class="empty-note"><span class="warn">Stomach ache. You\'re going to bed hungry tonight.</span></p>':'')+'</fieldset></div>'+
+      '<div class="sleepbar"><span>Tonight costs '+fmt(cost)+' · wake with <b class="num">'+after+'</b> energy'+(S.stomach?' <span class="warn">(halved)</span>':'')+'</span>'+
       '<button class="primary" data-a="sleep" '+(S.gold<cost?'disabled':'')+'>'+(S.gold<cost?'Can\'t afford this':'Turn in for the night')+'</button></div>';
     return;
   }
-  head.innerHTML='<h2>Adventures</h2><button data-a="rest" '+(S.ended?'disabled':'')+'>Rest day (+'+CFG.restBonus+' energy)</button>';
+  const rc=rerollCost();
+  head.innerHTML='<h2>Adventures</h2><span class="acts"><button data-a="reroll" title="New quests for today. Price doubles each time and resets tomorrow." '+(S.ended||S.gold<rc?'disabled':'')+'>Reroll · '+fmt(rc,true)+'</button>'+(S.questsToday?'<button data-a="endDay" title="Head back to town for lodging and supper">End the day</button>':'<button data-a="rest" '+(S.ended?'disabled':'')+'>Rest day (+'+CFG.restBonus+')</button>')+'</span>';
   let h='';
   if(S.event&&S.event.type==='merchant'&&S.eq[S.event.slot]){
     const g=S.eq[S.event.slot];
     h+='<div class="event"><span class="label">Traveling merchant</span><div>He has his eye on your <b>'+esc(g.name)+'</b> and offers '+fmt(S.event.offer)+', about 30% over the going rate.</div>'+
       '<div class="acts"><button class="primary" data-a="merchantYes">Take the coin</button><button data-a="merchantNo">No deal</button></div></div>';
   }
+  if(S.questsToday){
+    const f=S.questsToday;
+    h+='<div class="fatigue"><b>'+f+' quest'+(f>1?'s':'')+' done today.</b> Each extra quest raises your injury risk by '+Math.round(CFG.fatigueRisk*100)+'%. Head back when you\'ve had enough.</div>';
+  }
   h+='<div class="jobs">';
   S.offers.forEach(k=>{
-    const j=job(k), c=chance(j), locked=c===0, oc=c>=.75?'hi':c>=.5?'md':'lo';
-    const pay=Math.floor(j.pay[0]/100)+'–'+Math.floor(j.pay[1]/100)+'g';
-    h+='<div class="job'+(locked?' locked':'')+'" style="--tc:'+TIER_COLOR[j.tier]+'">'+
+    const done=(S.doneToday||[]).includes(k);
+    const j=job(k), c=chance(j), locked=c===0||done, oc=c>=.75?'hi':c>=.5?'md':'lo';
+    const pr=jobPay(j), pay=Math.floor(pr[0]/100)+'–'+Math.floor(pr[1]/100)+'g';
+    h+='<div class="job'+(done?' done':locked?' locked':'')+'" style="--tc:'+TIER_COLOR[j.tier]+'">'+
       '<div class="badge">'+ic(JOB_ICON[j.key])+'</div>'+
-      '<div class="ttl"><h3>'+esc(j.name)+'</h3><span class="tier">'+TIER_NAME[j.tier]+' · '+esc(j.where)+(!locked&&S.energy<j.energy?' · <span class="tired">Too tired, odds halved</span>':'')+'</span></div>'+
-      '<div class="stats"><span>Pays<b>'+pay+'</b></span><span>Time<b>'+j.secs+'s</b></span><span>Wear<b>'+j.wear+'</b></span>'+
-      '<span>Energy<b>−'+j.energy+'</b></span><span>Loot<b>'+Math.round(j.loot*100)+'%</b></span><span>Odds<b class="odds '+oc+'">'+(locked?'–':Math.round(c*100)+'%')+'</b></span></div>'+
-      '<button class="go '+(locked?'':'primary')+'" data-a="job" data-id="'+j.key+'" '+(locked||S.ended?'disabled':'')+'>'+(locked?'Needs '+j.min:'Set out')+'</button></div>';
+      '<div class="ttl"><h3>'+esc(j.name)+'</h3><span class="tier">'+TIER_NAME[j.tier]+' · '+esc(j.where)+(done?' · <span class="donetag">Done today</span>':'')+(!locked&&S.energy<jobEnergy(j)?' · <span class="tired">Too tired, odds halved</span>':'')+'</span></div>'+
+      '<div class="stats"><span>Pays<b>'+pay+'</b></span><span>Time<b>'+j.secs+'s</b></span><span>Wear<b>'+jobWear(j)+'</b></span>'+
+      '<span>Energy<b>−'+jobEnergy(j)+'</b></span><span>Loot<b>'+Math.round(j.loot*100)+'%</b></span><span>Odds<b class="odds '+oc+'">'+(c===0?'–':Math.round(c*100)+'%')+(wx().odds?'<i class="wxodd" title="'+esc(weather().name)+'"> '+Math.round(wx().odds*100)+'</i>':'')+'</b></span></div>'+
+      '<button class="go '+(locked?'':'primary')+'" data-a="job" data-id="'+j.key+'" '+(locked||S.ended?'disabled':'')+'>'+(done?'Done':locked?'Needs '+j.min:'Set out')+'</button></div>';
   });
   body.innerHTML=h+'</div>';
 }
@@ -753,41 +931,53 @@ function renderBag(){
   const mats=S.bag.filter(i=>i.kind==='mat'), tab=S.bagTab||'loot';
   const tabs='<div class="tabs"><button class="tabbtn'+(tab==='loot'?' on':'')+'" data-a="tab" data-id="loot">Bag <span class="num">'+S.bag.length+'/'+CFG.bagSize+'</span></button>'+
     '<button class="tabbtn'+(tab==='supplies'?' on':'')+'" data-a="tab" data-id="supplies">Supplies <span class="num">'+S.rations+'</span></button></div>';
-  if(tab==='supplies'){
-    document.getElementById('baghead').innerHTML=tabs+'<span class="label">Rations</span>';
-    const full=S.energy>=100;
-    document.getElementById('bag').innerHTML='<div class="supply"><div class="cell" style="--rc:var(--gold);width:72px">'+ic('ration')+'<span class="qty num">'+S.rations+'</span></div>'+
-      '<div style="min-width:0"><div class="nm" style="font-weight:700">Ration meal</div><p class="empty-note">Trail bread, hard cheese, and dried meat. Eat one any time, even on the road, for +'+CFG.rationEnergy+' energy.</p></div></div>'+
-      '<div class="acts" style="margin-top:12px"><button class="primary" data-a="eatRation" '+(!S.rations||full||S.ended?'disabled':'')+'>'+(full?'Energy is full':'Eat one (+'+CFG.rationEnergy+')')+'</button>'+
-      '<button data-a="buyRation" data-id="1" '+(S.gold<CFG.rationCost||S.ended?'disabled':'')+'>Buy 1 · '+fmt(CFG.rationCost)+'</button>'+
-      '<button data-a="buyRation" data-id="5" '+(S.gold<CFG.rationCost*5||S.ended?'disabled':'')+'>Buy 5 · '+fmt(CFG.rationCost*5)+'</button></div>';
-    return;
-  }
+  // the Sell all button stays in place on both tabs so the header never changes height
   document.getElementById('baghead').innerHTML=tabs+
-    '<button data-a="sellMats" '+(!mats.length||!inTown()?'disabled':'')+'>Sell materials'+(mats.length?' · '+fmt(mats.reduce((a,i)=>a+i.value,0),true):'')+'</button>';
+    '<button data-a="sellMats" class="'+(tab==='loot'?'':'ghost')+'" '+(!mats.length||!inTown()||tab!=='loot'?'disabled':'')+'>Sell all'+(mats.length?' · '+gShort(mats.reduce((a,i)=>a+sellValue(i),0)):'')+'</button>';
+
+  // Bag tab
   let h='<div class="bag">';
   for(let i=0;i<CFG.bagSize;i++){
     const it=S.bag[i];
     if(!it){ h+='<div class="cell blank"></div>'; continue; }
     const iconK=it.kind==='mat'?it.icon:it.slot;
-    const up=it.kind==='gear'&&gearPower(it)>gearPower(S.eq[it.slot]);
-    h+='<button class="cell'+(S.selBag===it.uid?' sel':'')+'" style="--rc:'+(it.kind==='mat'?'#6b7486':RARITY[it.rarity].c)+'" data-a="selBag" data-id="'+it.uid+'" aria-label="'+esc(it.name)+'">'+ic(iconK)+(up?'<span class="up">▲</span>':'')+'</button>';
+    const up=it.kind==='gear'&&gearPower(it)>gearPower(S.eq[it.slot]), mk=it.kind==='mat'?marketMult(it.name):1;
+    h+='<button class="cell'+(S.selBag===it.uid?' sel':'')+'" style="--rc:'+(it.kind==='mat'?'#6b7486':RARITY[it.rarity].c)+'" data-a="selBag" data-id="'+it.uid+'" aria-label="'+esc(it.name)+'">'+ic(iconK)+(up||mk>=1.2?'<span class="up">▲</span>':mk<=.8?'<span class="dn">▼</span>':'')+'</button>';
   }
-  h+='</div>';
+  h+='</div><div class="bagdetail">';
   const it=S.bag.find(x=>x.uid===S.selBag);
   if(!it){
-    h+='<p class="empty-note" style="margin-top:10px">'+(S.bag.length?'Select an item to sell or equip it.':'Adventures sometimes bring back materials and gear. They\'ll show up here.')+'</p>';
+    // same three rows as a gear card (kept invisible) so the panel is the same height with or without a selection
+    h+='<div class="detail placeholder"><div class="ghostrows" aria-hidden="true"><div class="dtop"><span class="nm">&nbsp;</span></div><div class="meta"><span>&nbsp;</span></div><div class="drow"><div class="acts"><button tabindex="-1">&nbsp;</button></div></div></div><p class="empty-note">'+(S.bag.length?'Select an item to sell or equip it.':'Loot from adventures shows up here.')+'</p></div>';
   } else if(it.kind==='mat'){
-    h+='<div class="detail"><div class="nm">'+esc(it.name)+'</div><div class="meta"><span>Material · sells for <b>'+fmt(it.value)+'</b></span></div>'+
-      '<div class="acts"><button class="primary" data-a="sellBag" '+(!inTown()?'disabled':'')+'>Sell · '+fmt(it.value,true)+'</button></div></div>';
+    const mk=marketMult(it.name);
+    h+='<div class="detail"><div class="dtop"><span class="nm">'+esc(it.name)+'</span><span class="dsub '+(mk>=1.2?'mk-up':mk<=.8?'mk-dn':'')+'" title="Material prices change every morning">'+mk.toFixed(2)+'x usual price</span></div>'+
+      '<div class="meta"><span>Material · prices change every morning</span></div>'+
+      '<div class="drow"><span class="meta"><span>Today <b>'+fmt(sellValue(it))+'</b></span></span>'+
+      '<div class="acts"><button class="primary" data-a="sellBag" '+(!inTown()?'disabled':'')+'>Sell · '+gShort(sellValue(it))+'</button></div></div></div>';
   } else {
     const cur=S.eq[it.slot], diff=Math.round(gearPower(it)-gearPower(cur)), r=it.dur/it.max, dc=r<.25?'low':r<.5?'mid':'';
-    h+='<div class="detail"><div class="nm" style="color:'+RARITY[it.rarity].c+'">'+esc(it.name)+'</div>'+
-      '<div class="meta"><span>'+SLOT_NAME[it.slot]+' · '+RARITY[it.rarity].label+'</span><span>Power <b>'+it.power+'</b> <span style="color:'+(diff>0?'var(--good)':diff<0?'var(--bad)':'var(--muted)')+'">('+(diff>0?'+':'')+diff+' vs equipped)</span></span></div>'+
-      '<div class="durrow '+dc+'"><div class="bar"><span style="width:'+r*100+'%"></span></div><span class="num">'+it.dur+'/'+it.max+'</span></div>'+
-      '<div class="acts"><button class="primary" data-a="equip" '+(!inTown()?'disabled':'')+'>Equip</button><button data-a="sellBag" '+(!inTown()?'disabled':'')+'>Sell · '+fmt(sellValue(it),true)+'</button></div></div>';
+    h+='<div class="detail"><div class="dtop"><span class="nm" style="color:'+RARITY[it.rarity].c+'" title="'+esc(it.name)+'">'+esc(it.name)+'</span><span class="dsub">'+SLOT_NAME[it.slot]+' · '+RARITY[it.rarity].label+'</span></div>'+
+      '<div class="meta"><span>Power <b>'+it.power+'</b> <span style="color:'+(diff>0?'var(--good)':diff<0?'var(--bad)':'var(--muted)')+'">('+(diff>0?'+':'')+diff+' vs equipped)</span></span></div>'+
+      '<div class="drow"><div class="durrow '+dc+'"><div class="bar"><span style="width:'+r*100+'%"></span></div><span class="num">'+it.dur+'/'+it.max+'</span></div>'+
+      '<div class="acts"><button class="primary" data-a="equip" '+(!inTown()?'disabled':'')+'>Equip</button><button data-a="sellBag" '+(!inTown()?'disabled':'')+'>Sell · '+gShort(sellValue(it))+'</button></div></div></div>';
   }
-  document.getElementById('bag').innerHTML=h;
+  h+='</div>';
+
+  // Supplies tab
+  const full=S.energy>=maxE(), sick=!!S.stomach, ate=S.rationsToday||0;
+  const note=sick?'<span class="warn">Your stomach can\'t take any more today.</span>'
+    : ate>=CFG.safeRations?'<span class="warn">You\'ve had '+ate+' today. Any more could upset your stomach.</span>'
+    : 'Eaten today: '+ate+' of '+CFG.safeRations+' safe.';
+  const sup='<div class="supply"><div class="cell" style="--rc:var(--gold)">'+ic('ration')+'<span class="qty num">'+S.rations+'</span></div>'+
+    '<div style="min-width:0"><div class="nm" style="font-weight:700">Ration meal</div><p class="empty-note">Eat one any time, even on the road, for +'+CFG.rationEnergy+' energy.</p></div></div>'+
+    '<div class="detail"><p class="empty-note">'+note+'</p>'+
+    '<div class="acts"><button class="primary" data-a="eatRation" '+(!S.rations||full||sick||S.ended?'disabled':'')+' title="'+(sick?'Not with that stomach ache':full?'Your energy is already full':'')+'">Eat one</button>'+
+    '<button data-a="buyRation" data-id="1" '+(S.gold<upkeep(CFG.rationCost)||S.ended?'disabled':'')+'>Buy 1 · '+fmt(upkeep(CFG.rationCost))+'</button>'+
+    '<button data-a="buyRation" data-id="5" '+(S.gold<upkeep(CFG.rationCost)*5||S.ended?'disabled':'')+'>Buy 5 · '+fmt(upkeep(CFG.rationCost)*5)+'</button></div></div>';
+
+  // both tabs share one stacked box, so switching tabs never changes the panel size
+  document.getElementById('bag').innerHTML='<div class="bagstack"><div class="pane'+(tab==='loot'?'':' off')+'">'+h+'</div><div class="pane'+(tab==='supplies'?'':' off')+'">'+sup+'</div></div>';
 }
 
 function farmText(g){
@@ -797,22 +987,52 @@ function farmText(g){
   if(g>=.25) return 'A hayloft above someone else\'s farm. You help with the harvest for room and board.';
   return 'Retirement was a nice idea. You\'re back at the docks, hauling crates.';
 }
+function histHTML(){
+  const all=loadHist(); if(!all.length) return '';
+  const best=all.slice().sort((a,b)=>b.stars-a.stars||b.gold-a.gold).slice(0,5);
+  const mine=best.some(r=>r.when===S.runWhen);
+  return '<div class="hist"><div class="label">Best runs · '+all.length+' played</div><ol>'+best.map((r,i)=>'<li class="'+(r.when===S.runWhen?'me':'')+'"><span class="num">#'+(i+1)+'</span><span class="num">'+r.stars.toFixed(1)+' ★</span><span class="num">'+Math.floor(r.gold/100).toLocaleString()+'g</span><span class="num">'+r.days+'d</span><span class="hname" title="'+esc(r.name||'')+'">'+(r.when===S.runWhen?'This run':esc(r.name||new Date(r.when).toLocaleDateString()))+'</span></li>').join('')+'</ol>'+
+    (mine?'':'<p class="empty-note" style="margin-top:6px">This run didn\'t make the top 5.</p>')+'</div>';
+}
+function startHTML(){
+  const v=S.draftName!==undefined?S.draftName:(S.name||'');
+  return '<div class="overlay"><form class="startcard" id="startform" role="dialog" aria-label="Start a new run">'+
+    '<span class="label">A reverse-progression adventure</span>'+
+    '<h2>Rust &amp; Retirement</h2>'+
+    '<p class="lede">Thirty years of adventuring. Your back hurts, your knees click, and you want a farm. You have one last stretch of work to save up for it.</p>'+
+    '<ul class="how">'+
+      '<li><b>Save 5,000 gold</b> to buy your farm. You start with legendary gear and very little coin.</li>'+
+      '<li><b>Your gear only goes down.</b> Every quest wears it out, and repairs cost more each time. When it\'s all broken, you retire.</li>'+
+      '<li><b>Quests take real time</b>, from 10 seconds to a minute. Chain a few in a day if you have the energy, but each extra one raises your injury risk.</li>'+
+      '<li><b>Evenings cost money.</b> Lodging and supper restore energy. Prices creep up the longer you stay out.</li>'+
+      '<li><b>Your rating</b> is 70% gold saved and 30% days lasted. Watch the weather, the market, and your stomach.</li>'+
+    '</ul>'+
+    '<label class="namefield" for="hero-name"><span class="label">Your name</span>'+
+      '<input id="hero-name" name="hero-name" type="text" maxlength="24" autocomplete="off" placeholder="The Old Veteran" value="'+esc(v)+'"></label>'+
+    '<div class="startrow"><span class="empty-note">You\'ll be known as <b id="hero-preview">'+esc(titleFor(v))+'</b>.</span><button class="primary" type="submit">Start the last stretch</button></div>'+
+  '</form></div>';
+}
 function renderEnd(){
   const el=document.getElementById('end');
+  if(!S.started){
+    if(!el.querySelector('#startform')){ el.innerHTML=startHTML(); const i=el.querySelector('#hero-name'); if(i){ try{ i.focus(); }catch(e){} } }
+    return;
+  }
   if(!S.ended){ el.innerHTML=''; return; }
   const sc=score();
   el.innerHTML='<div class="overlay"><div class="endcard" role="dialog" aria-label="Retirement">'+
-    '<span class="label">The adventure is over</span><h2>Retired after '+S.day+' day'+(S.day===1?'':'s')+'</h2>'+
+    '<span class="label">The adventure is over</span><h2>'+esc(heroName())+(plainName(S.name)?',':'')+' retired after '+S.day+' day'+(S.day===1?'':'s')+'</h2>'+
     '<p>'+esc(S.endReason)+'</p>'+starsHTML(sc.stars,'stars')+
     '<div class="num" style="font-size:1.1rem">'+sc.stars.toFixed(1)+' of 5 stars</div><p>'+farmText(sc.g)+'</p>'+
     '<div class="scorecard"><div><span class="label">Gold saved</span><b>'+plain(S.gold)+'</b></div>'+
     '<div><span class="label">Gold score · '+Math.round(CFG.goldWeight*100)+'%</span><b>'+Math.round(sc.g*100)+'%</b></div>'+
     '<div><span class="label">Longevity · '+Math.round((1-CFG.goldWeight)*100)+'%</span><b>'+Math.round(sc.l*100)+'%</b></div>'+
     '<div><span class="label">Days of '+CFG.targetDays+'</span><b>'+S.day+'</b></div></div>'+
+    histHTML()+
     '<button class="primary" data-a="newrun">Play again</button></div></div>';
 }
 
-function render(){ renderTop(); renderGear(); renderJournal(); renderAdv(); renderBag(); renderEnd(); }
+function render(){ if(S&&!S.ended) checkMilestones(); renderTop(); renderGear(); renderJournal(); renderAdv(); renderBag(); renderEnd(); }
 
 function tick(){
   if(!S||!S.trip) return;
@@ -834,16 +1054,30 @@ setInterval(tick,200);
 document.addEventListener('click',e=>{
   const b=e.target.closest('button[data-a]'); if(!b||b.disabled) return;
   const a=b.dataset.a; if(!A[a]) return;
+  if(!muted) ac();
   if(a!=='newrun-ask'&&a!=='newrun-no') S.askNew=false;
   A[a](b.dataset.id); save(); render();
 });
+document.addEventListener('submit',e=>{
+  if(e.target.id!=='startform') return;
+  e.preventDefault(); if(!muted) ac(); A.begin(); save(); render();
+});
+document.addEventListener('input',e=>{ if(e.target.id==='hero-name' && S){ S.draftName=e.target.value; const pv=document.getElementById('hero-preview'); if(pv) pv.textContent=titleFor(e.target.value); } });
 document.addEventListener('change',e=>{
+  if(e.target.id==='hero-name') return;
   if(e.target.name==='lodge') S.lodge=e.target.value;
   if(e.target.name==='meal') S.meal=e.target.value;
   save(); render();
 });
 
 S=load();
-if(S && S.offers.length<CFG.boardSize) rollOffers();
-if(!S){ S=newState(); startDay(); log('Day one of the last stretch. Five thousand gold buys a farm.'); save(); }
+if(S){
+  if(S.started===undefined) S.started=true; // saves from before the start screen existed
+  if(!S.injuries) S.injuries=[];
+  if(S.questsToday===undefined){ S.questsToday=0; S.doneToday=[]; }
+  if(!S.market) rollMarket();
+  if(!S.weather) S.weather=rollWeather();
+  if(S.ms===undefined){ S.ms=-1; while(S.ms+1<MILESTONES.length && S.gold>=MILESTONES[S.ms+1].at) S.ms++; }
+}
+if(!S){ S=newState(); S.started=false; startDay(); save(); }
 render();
