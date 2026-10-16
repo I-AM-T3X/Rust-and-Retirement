@@ -10,7 +10,7 @@ Every run starts with a short intro screen that explains the basics and asks for
 
 The screen is split into three columns:
 
-- **Left:** Your character on top, with five gear slots and your combat power. Your bag sits underneath, with two tabs: **Bag** for loot and gear, and **Supplies** for rations.
+- **Left:** Your character on top, with six gear slots and your combat power. Your bag sits underneath, with two tabs: **Bag** for loot and gear, and **Supplies** for rations.
 - **Middle:** The journal. Everything that happens gets logged here, newest first.
 - **Right:** Adventures, or your evening choices once you're back in town.
 
@@ -83,12 +83,13 @@ There are 37 adventures in rotation. The board shows 6 at a time: Haul Crates pl
 
 ## Gear
 
-You start with five pieces: weapon, armor, shield, helm, and boots. Each one adds to your combat power, and your power decides which adventures you can take.
+You start with six pieces: weapon, armor, shield, helm, boots, and a trinket. Each one adds to your combat power, and your power decides which adventures you can take.
 
 - **Durability:** Every adventure wears your gear down. When a piece hits 0, it breaks and stops adding power. The wear numbers on the quest cards already include weather.
 - **Worn gear:** Anything under 25% durability fights at half power.
 - **Repairs:** You can repair gear, but every repair on the same piece costs 1.6x more than the last one.
-- **Selling:** Your legendary sword, Emberbrand, sells for around 1500 gold on day one. That's a huge head start, but you lose almost half your power.
+- **Selling:** Gear is worth less the more worn it is. Your legendary sword, Emberbrand, sells for 2,500 gold on day one, about 1,400 at half durability, and only a few hundred once it's nearly broken. Sell it early for a guaranteed head start, or keep it for the big quests and accept that it loses value every time you swing it.
+- **Trinkets:** Rings, necklaces, and charms barely add power, but they bring luck, which raises your loot and gear drop chances. You start with the **Lucky Coin Necklace** (+50% luck), your very first payday on a cord. Jewelry rarely takes a hit, so it tends to outlast your other gear. Trinkets you find can roll their own luck, from +10% (common) up to +50% (legendary). The loot numbers on the quest cards turn teal when luck is boosting them.
 - **Saying goodbye:** When a piece breaks, the journal gives it a send-off. Your starting gear each has its own goodbye line.
 
 ## Injuries
@@ -195,11 +196,27 @@ When the link is shared on Discord, X, or anywhere else, it shows a preview card
 
 Your progress saves automatically in your browser, including adventures in progress. You can close the tab mid-adventure and pick up where you left off.
 
+## Balance Notes
+
+The numbers were tuned by simulating thousands of runs with different playstyles:
+
+| Playstyle | Avg gold | Avg stars |
+|-----------|----------|-----------|
+| Careful: keep Emberbrand, steady quests | ~3,750g | ~4.0 |
+| Cash out: sell Emberbrand on day one | ~3,800g | ~3.8 |
+| Sell late: use your gear, then sell it worn | ~3,800g | ~4.0 |
+| Reroll hunting for the big quests | ~3,800g | ~3.9 |
+| Greedy: hardest quest available, any odds | ~2,200g | ~2.7 |
+| Odd jobs only | ~670g | ~2.0 |
+| Repair everything, every time | ~1,750g | ~2.7 |
+
+Several strategies work, none of them dominates, and reckless play, grinding, and over-repairing all lose. Reaching the full 5,000 gold takes good play and some luck.
+
 ## Tweaking the Balance
 
 All the numbers live at the top of `game.js`:
 
-- `CFG` holds the retirement goal, starting gold, target days, star weighting, ration cost, repair cost growth, bag size (18), how many adventures show on the board (6), the reroll cost and growth, the healer's cost, how fast prices rise, the extra injury risk per quest (`fatigueRisk`), how many rations are safe in a day (`safeRations`), and how fast gear wears out (`wearMult`, where 1 is full wear and 0.6 is 40% less)
+- `CFG` holds the retirement goal, starting gold, target days, star weighting, ration cost, repair cost growth, bag size (18), how many adventures show on the board (6), the reroll cost and growth, the healer's cost, how fast prices rise, the extra injury risk per quest (`fatigueRisk`), how many rations are safe in a day (`safeRations`), and how fast gear wears out (`wearMult`, where 1 is full wear and 0.5 is half)
 - `LODGING` and `MEALS` hold nightly costs and energy
 - `START_GEAR` holds your starting gear
 - `JOBS` holds each adventure's power requirement, time, pay range, wear, energy cost, loot chances, and materials

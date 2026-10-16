@@ -10,7 +10,7 @@ const CFG = {
   bagSize: 18,
   rerollBase: 50,      // first board reroll each day costs 5 silver
   rerollGrowth: 2,     // each reroll after that costs 2x the last; resets every morning
-  wearMult: .6,        // gear wear from quests (1 = full wear, .6 = 40% less)
+  wearMult: 0.5,       // gear wear from quests (1 = full wear, .5 = half)
   safeRations: 3,      // eat more than this many rations in one day and you risk a stomach ache
   fatigueRisk: .05,    // each extra quest in one day adds 5% injury risk
   healCost: 2000,     // the healer charges 20g to treat one injury (rises with prices)
@@ -28,17 +28,18 @@ const MEALS = [
   {key:'stew',  name:'Thin stew',    cost:10, energy:5,  note:'Mostly water'},
   {key:'skip',  name:'Skip supper',  cost:0,  energy:0,  note:'Stomach complains'}
 ];
-const SLOTS = ['weapon','armor','shield','helm','boots'];
-const SLOT_NAME = {weapon:'Weapon',armor:'Armor',shield:'Shield',helm:'Helm',boots:'Boots'};
-const BASE_POWER = {weapon:30,armor:14,shield:10,helm:6,boots:4};
-const BASE_MAX = {weapon:60,armor:80,shield:50,helm:40,boots:35};
-const WEAR_WEIGHT = {weapon:.4,armor:.25,shield:.15,helm:.1,boots:.1};
+const SLOTS = ['weapon','armor','shield','helm','boots','trinket'];
+const SLOT_NAME = {weapon:'Weapon',armor:'Armor',shield:'Shield',helm:'Helm',boots:'Boots',trinket:'Trinket'};
+const BASE_POWER = {weapon:30,armor:14,shield:10,helm:6,boots:4,trinket:4};
+const BASE_MAX = {weapon:60,armor:80,shield:50,helm:40,boots:35,trinket:50};
+const WEAR_WEIGHT = {weapon:.4,armor:.25,shield:.15,helm:.1,boots:.1,trinket:.05}; // jewelry rarely takes a hit
 const START_GEAR = [
-  {slot:'weapon',name:'Emberbrand, the Old Flame',power:30,max:60,repairBase:8000,sell:150000,rarity:'legendary'},
+  {slot:'weapon',name:'Emberbrand, the Old Flame',power:30,max:60,repairBase:8000,sell:250000,rarity:'legendary'},
   {slot:'armor', name:'Dented Mithral Hauberk',power:14,max:80,repairBase:6000,sell:40000,rarity:'epic'},
   {slot:'shield',name:'Kite Shield of the Third Company',power:10,max:50,repairBase:4000,sell:20000,rarity:'rare'},
   {slot:'helm',  name:'Owlcrest Helm',power:6,max:40,repairBase:3000,sell:12000,rarity:'rare'},
-  {slot:'boots', name:'Road-Worn Boots',power:4,max:35,repairBase:2000,sell:3000,rarity:'common'}
+  {slot:'boots', name:'Road-Worn Boots',power:4,max:35,repairBase:2000,sell:3000,rarity:'common'},
+  {slot:'trinket',name:'Lucky Coin Necklace',power:4,max:30,repairBase:2000,sell:1500,rarity:'rare',luck:.5}
 ];
 const RARITY = {
   common:{label:'Common',c:'var(--r-common)',mult:1},
@@ -86,32 +87,33 @@ const GOODBYE = {
   'Dented Mithral Hauberk':"The Mithral Hauberk finally splits at the seams. It stopped a lot of arrows that had your name on them.",
   'Kite Shield of the Third Company':"The Kite Shield of the Third Company splinters. You trace the old company crest one last time.",
   'Owlcrest Helm':"The Owlcrest Helm caves in. Your old captain gave you that helm. You pry off the owl crest and keep it.",
-  'Road-Worn Boots':"The Road-Worn Boots fall apart. They walked you across half the world. Barefoot it is."
+  'Road-Worn Boots':"The Road-Worn Boots fall apart. They walked you across half the world. Barefoot it is.",
+  'Lucky Coin Necklace':"The cord on your Lucky Coin Necklace finally snaps. That coin was your very first payday, thirty years ago. You tuck it in your pocket, but it doesn't feel lucky anymore."
 };
 const GOODBYE_LEGENDARY = "The {name} shatters. Legends don't last forever. Neither do you.";
 const GOODBYE_GENERIC = ["Your {name} gives out. It had a good run.","The {name} breaks. You give it a respectful nod before tossing it.","The {name} is done for. Easy come, easy go."];
 
 // secs = how long the adventure takes. loot = chance of materials, gearDrop = chance of a gear piece (on success)
 const JOBS = [
-  {key:"docks",tier:0,name:"Haul Crates",where:"The docks",min:0,secs:10,pay:[200,500],wear:1,energy:20,loot:0.03,gearDrop:0,mat:{name:"Crate of Salted Fish",icon:"crate",v:[300,600]},prefix:""},
-  {key:"herbs",tier:0,name:"Gather Moonleaf",where:"Willow Hollow",min:0,secs:12,pay:[300,600],wear:1,energy:18,loot:0.05,gearDrop:0,mat:{name:"Bundle of Moonleaf",icon:"herb",v:[400,800]},prefix:""},
+  {key:"docks",tier:0,name:"Haul Crates",where:"The docks",min:0,secs:10,pay:[200,500],wear:4,energy:20,loot:0.03,gearDrop:0,mat:{name:"Crate of Salted Fish",icon:"crate",v:[300,600]},prefix:""},
+  {key:"herbs",tier:0,name:"Gather Moonleaf",where:"Willow Hollow",min:0,secs:12,pay:[300,600],wear:4,energy:18,loot:0.05,gearDrop:0,mat:{name:"Bundle of Moonleaf",icon:"herb",v:[400,800]},prefix:""},
   {key:"rooster",tier:1,name:"Rooster Roundup",where:"Fenwick Farm",min:5,secs:14,pay:[700,1200],wear:3,energy:18,loot:0.06,gearDrop:0.01,mat:{name:"Prize Rooster Feather",icon:"feather",v:[600,1200]},prefix:"Barnyard"},
   {key:"rats",tier:1,name:"Cellar Rats",where:"Old Town",min:8,secs:15,pay:[800,1400],wear:5,energy:20,loot:0.06,gearDrop:0.01,mat:{name:"Bundle of Rat Pelts",icon:"pelt",v:[800,1500]},prefix:"Cellar-Found"},
   {key:"wolves",tier:1,name:"Wolf Pack",where:"Hollow Fen",min:12,secs:18,pay:[900,1500],wear:6,energy:24,loot:0.07,gearDrop:0.01,mat:{name:"Gray Wolf Pelt",icon:"pelt",v:[1000,1800]},prefix:"Wolfhide"},
   {key:"goblins",tier:2,name:"Goblin Camp",where:"Thornwood",min:20,secs:22,pay:[1800,2800],wear:10,energy:28,loot:0.08,gearDrop:0.02,mat:{name:"Goblin Trinkets",icon:"trinket",v:[1500,3000]},prefix:"Goblin-Made"},
   {key:"crypt",tier:2,name:"Restless Crypt",where:"Ashby Churchyard",min:24,secs:26,pay:[2000,3000],wear:11,energy:30,loot:0.08,gearDrop:0.02,mat:{name:"Grave Silver",icon:"gem",v:[2000,3500]},prefix:"Gravewarden's"},
-  {key:"escort",tier:3,name:"Caravan Escort",where:"Salt Road",min:30,secs:30,pay:[2800,4000],wear:13,energy:35,loot:0.1,gearDrop:0.03,mat:{name:"Spice Sachet",icon:"sachet",v:[3000,5000]},prefix:"Caravan Guard's"},
-  {key:"bridge",tier:3,name:"Bandit Toll Bridge",where:"Ferris Crossing",min:32,secs:30,pay:[3000,4200],wear:14,energy:34,loot:0.1,gearDrop:0.03,mat:{name:"Stolen Silverware",icon:"trinket",v:[3000,5000]},prefix:"Bridge Warden's"},
-  {key:"mine",tier:3,name:"Haunted Mine",where:"Copperdeep",min:34,secs:32,pay:[3000,4400],wear:15,energy:36,loot:0.1,gearDrop:0.03,mat:{name:"Copper Ore Nugget",icon:"gem",v:[3500,5500]},prefix:"Miner's"},
-  {key:"ogre",tier:4,name:"Ogre Bounty",where:"Millbrook",min:42,secs:38,pay:[4000,6000],wear:18,energy:40,loot:0.12,gearDrop:0.04,mat:{name:"Ogre Tusk",icon:"tusk",v:[5000,8000]},prefix:"Ogre-Hide"},
-  {key:"troll",tier:4,name:"Swamp Troll",where:"Mirewater",min:45,secs:40,pay:[4200,6400],wear:20,energy:42,loot:0.12,gearDrop:0.04,mat:{name:"Matted Troll Horn",icon:"horn",v:[5500,8500]},prefix:"Trollhide"},
-  {key:"wyvern",tier:5,name:"Wyvern Nest",where:"Gray Cliffs",min:52,secs:48,pay:[6400,9200],wear:26,energy:48,loot:0.14,gearDrop:0.05,mat:{name:"Wyvern Egg",icon:"egg",v:[9000,15000]},prefix:"Wyvernbone"},
-  {key:"necro",tier:5,name:"The Hedge Necromancer",where:"Blackmoor",min:54,secs:50,pay:[6800,9600],wear:27,energy:50,loot:0.14,gearDrop:0.05,mat:{name:"Cursed Grimoire",icon:"skull",v:[10000,16000]},prefix:"Bone-Carved"},
-  {key:"giant",tier:5,name:"Hill Giant's Toll",where:"The Highpass",min:56,secs:52,pay:[7200,10000],wear:30,energy:52,loot:0.15,gearDrop:0.05,mat:{name:"Giant's Toe Ring",icon:"gem",v:[11000,17000]},prefix:"Giantsteel"},
-  {key:"rival",tier:6,name:"Old Rival's Last Duel",where:"Dunmore Arena",min:58,secs:58,pay:[12000,17000],wear:38,energy:55,loot:0.18,gearDrop:0.07,mat:{name:"Rival's Champion Medal",icon:"medal",v:[15000,25000]},prefix:"Rival's"},
-  {key:"drake",tier:6,name:"The Ashen Drake",where:"Cinder Peak",min:60,secs:60,pay:[13000,18000],wear:42,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ashen Drake Scale",icon:"scale",v:[18000,28000]},prefix:"Ashen"},
-  {key:"mail",tier:0,name:"Deliver the Post",where:"Willowmere Road",min:0,secs:11,pay:[250,550],wear:1,energy:18,loot:0.04,gearDrop:0,mat:{name:"Lost Love Letter",icon:"scroll",v:[300,700]},prefix:""},
-  {key:"sheep",tier:0,name:"Sheep Shearing",where:"Brambleton",min:0,secs:13,pay:[300,650],wear:2,energy:22,loot:0.05,gearDrop:0,mat:{name:"Bale of Wool",icon:"pelt",v:[400,800]},prefix:""},
+  {key:"escort",tier:3,name:"Caravan Escort",where:"Salt Road",min:30,secs:30,pay:[3500,5000],wear:13,energy:35,loot:0.1,gearDrop:0.03,mat:{name:"Spice Sachet",icon:"sachet",v:[3000,5000]},prefix:"Caravan Guard's"},
+  {key:"bridge",tier:3,name:"Bandit Toll Bridge",where:"Ferris Crossing",min:32,secs:30,pay:[3800,5200],wear:14,energy:34,loot:0.1,gearDrop:0.03,mat:{name:"Stolen Silverware",icon:"trinket",v:[3000,5000]},prefix:"Bridge Warden's"},
+  {key:"mine",tier:3,name:"Haunted Mine",where:"Copperdeep",min:34,secs:32,pay:[3800,5500],wear:15,energy:36,loot:0.1,gearDrop:0.03,mat:{name:"Copper Ore Nugget",icon:"gem",v:[3500,5500]},prefix:"Miner's"},
+  {key:"ogre",tier:4,name:"Ogre Bounty",where:"Millbrook",min:42,secs:38,pay:[5000,7500],wear:18,energy:40,loot:0.12,gearDrop:0.04,mat:{name:"Ogre Tusk",icon:"tusk",v:[5000,8000]},prefix:"Ogre-Hide"},
+  {key:"troll",tier:4,name:"Swamp Troll",where:"Mirewater",min:45,secs:40,pay:[5200,8000],wear:20,energy:42,loot:0.12,gearDrop:0.04,mat:{name:"Matted Troll Horn",icon:"horn",v:[5500,8500]},prefix:"Trollhide"},
+  {key:"wyvern",tier:5,name:"Wyvern Nest",where:"Gray Cliffs",min:52,secs:48,pay:[8000,11500],wear:26,energy:48,loot:0.14,gearDrop:0.05,mat:{name:"Wyvern Egg",icon:"egg",v:[9000,15000]},prefix:"Wyvernbone"},
+  {key:"necro",tier:5,name:"The Hedge Necromancer",where:"Blackmoor",min:54,secs:50,pay:[8500,12000],wear:27,energy:50,loot:0.14,gearDrop:0.05,mat:{name:"Cursed Grimoire",icon:"skull",v:[10000,16000]},prefix:"Bone-Carved"},
+  {key:"giant",tier:5,name:"Hill Giant's Toll",where:"The Highpass",min:56,secs:52,pay:[9000,12500],wear:30,energy:52,loot:0.15,gearDrop:0.05,mat:{name:"Giant's Toe Ring",icon:"gem",v:[11000,17000]},prefix:"Giantsteel"},
+  {key:"rival",tier:6,name:"Old Rival's Last Duel",where:"Dunmore Arena",min:58,secs:58,pay:[15000,21200],wear:38,energy:55,loot:0.18,gearDrop:0.07,mat:{name:"Rival's Champion Medal",icon:"medal",v:[15000,25000]},prefix:"Rival's"},
+  {key:"drake",tier:6,name:"The Ashen Drake",where:"Cinder Peak",min:60,secs:60,pay:[16200,22500],wear:42,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ashen Drake Scale",icon:"scale",v:[18000,28000]},prefix:"Ashen"},
+  {key:"mail",tier:0,name:"Deliver the Post",where:"Willowmere Road",min:0,secs:11,pay:[250,550],wear:4,energy:18,loot:0.04,gearDrop:0,mat:{name:"Lost Love Letter",icon:"scroll",v:[300,700]},prefix:""},
+  {key:"sheep",tier:0,name:"Sheep Shearing",where:"Brambleton",min:0,secs:13,pay:[300,650],wear:4,energy:22,loot:0.05,gearDrop:0,mat:{name:"Bale of Wool",icon:"pelt",v:[400,800]},prefix:""},
   {key:"bees",tier:1,name:"Angry Beehive",where:"Honeyvale Orchard",min:6,secs:14,pay:[700,1200],wear:3,energy:20,loot:0.06,gearDrop:0.01,mat:{name:"Jar of Wild Honey",icon:"bottle",v:[700,1300]},prefix:"Beekeeper's"},
   {key:"pumpkin",tier:1,name:"Giant Pumpkin Haul",where:"Gourdfield",min:7,secs:16,pay:[800,1300],wear:4,energy:26,loot:0.06,gearDrop:0.01,mat:{name:"Prize Pumpkin Seeds",icon:"herb",v:[700,1200]},prefix:"Farmhand's"},
   {key:"spiders",tier:1,name:"Spider Nest",where:"Old Mill Loft",min:10,secs:17,pay:[900,1500],wear:6,energy:22,loot:0.07,gearDrop:0.01,mat:{name:"Spool of Spider Silk",icon:"web",v:[1000,1800]},prefix:"Silkspun"},
@@ -120,16 +122,16 @@ const JOBS = [
   {key:"smugglers",tier:2,name:"Smugglers' Cove",where:"Saltmarsh",min:22,secs:24,pay:[1900,2900],wear:10,energy:30,loot:0.08,gearDrop:0.02,mat:{name:"Smuggled Brandy",icon:"bottle",v:[2000,3200]},prefix:"Smuggler's"},
   {key:"scarecrow",tier:2,name:"The Walking Scarecrow",where:"Harrow Fields",min:22,secs:24,pay:[1900,2800],wear:10,energy:28,loot:0.08,gearDrop:0.02,mat:{name:"Enchanted Straw",icon:"herb",v:[1800,3000]},prefix:"Harrowed"},
   {key:"boar",tier:2,name:"Great Tusked Boar",where:"Oakhollow Woods",min:26,secs:26,pay:[2100,3100],wear:12,energy:32,loot:0.09,gearDrop:0.02,mat:{name:"Boar Tusk",icon:"tusk",v:[2000,3500]},prefix:"Boarhide"},
-  {key:"witch",tier:3,name:"The Bog Witch's Bargain",where:"Murkwater",min:32,secs:32,pay:[3000,4300],wear:14,energy:35,loot:0.1,gearDrop:0.03,mat:{name:"Witch's Potion",icon:"bottle",v:[3500,5500]},prefix:"Hexwoven"},
-  {key:"lighthouse",tier:3,name:"Lighthouse Siege",where:"Gull Point",min:35,secs:34,pay:[3200,4600],wear:16,energy:36,loot:0.1,gearDrop:0.03,mat:{name:"Black Pearl",icon:"gem",v:[3500,6000]},prefix:"Tidecaller's"},
-  {key:"tourney",tier:3,name:"Village Tourney",where:"Kingsbridge Green",min:36,secs:32,pay:[3200,4500],wear:15,energy:34,loot:0.1,gearDrop:0.03,mat:{name:"Tourney Ribbon",icon:"medal",v:[3000,5000]},prefix:"Champion's"},
-  {key:"basilisk",tier:4,name:"Basilisk Den",where:"Stonefall Quarry",min:44,secs:40,pay:[4200,6200],wear:20,energy:42,loot:0.12,gearDrop:0.04,mat:{name:"Basilisk Eye",icon:"gem",v:[5500,8500]},prefix:"Stoneguard"},
-  {key:"banditking",tier:4,name:"Bandit King's Fort",where:"Redcliff",min:46,secs:42,pay:[4400,6600],wear:21,energy:44,loot:0.12,gearDrop:0.04,mat:{name:"Bandit King's Signet",icon:"trinket",v:[6000,9000]},prefix:"Bandit King's"},
-  {key:"manor",tier:4,name:"Haunted Manor",where:"Ravensworth Hall",min:48,secs:42,pay:[4600,6800],wear:20,energy:44,loot:0.12,gearDrop:0.04,mat:{name:"Spectral Locket",icon:"trinket",v:[6000,9500]},prefix:"Ghostly"},
-  {key:"kraken",tier:5,name:"Kraken in the Harbor",where:"Port Merrow",min:55,secs:52,pay:[7000,9800],wear:28,energy:50,loot:0.14,gearDrop:0.05,mat:{name:"Barrel of Kraken Ink",icon:"bottle",v:[10000,16000]},prefix:"Krakenhide"},
-  {key:"yeti",tier:5,name:"The Frostpeak Yeti",where:"Frostpeak Pass",min:56,secs:54,pay:[7400,10200],wear:30,energy:54,loot:0.15,gearDrop:0.05,mat:{name:"Yeti Fur",icon:"pelt",v:[11000,17000]},prefix:"Frostbound"},
-  {key:"lich",tier:6,name:"The Drowned Lich",where:"Sunken Abbey",min:59,secs:58,pay:[12500,17500],wear:40,energy:56,loot:0.18,gearDrop:0.07,mat:{name:"Lich's Phylactery Shard",icon:"skull",v:[16000,26000]},prefix:"Lichbane"},
-  {key:"reunion",tier:6,name:"One Last Dungeon",where:"Hollowdeep",min:60,secs:60,pay:[13500,19000],wear:44,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ancient Crown",icon:"medal",v:[19000,29000]},prefix:"Hero's"}
+  {key:"witch",tier:3,name:"The Bog Witch's Bargain",where:"Murkwater",min:32,secs:32,pay:[3800,5400],wear:14,energy:35,loot:0.1,gearDrop:0.03,mat:{name:"Witch's Potion",icon:"bottle",v:[3500,5500]},prefix:"Hexwoven"},
+  {key:"lighthouse",tier:3,name:"Lighthouse Siege",where:"Gull Point",min:35,secs:34,pay:[4000,5800],wear:16,energy:36,loot:0.1,gearDrop:0.03,mat:{name:"Black Pearl",icon:"gem",v:[3500,6000]},prefix:"Tidecaller's"},
+  {key:"tourney",tier:3,name:"Village Tourney",where:"Kingsbridge Green",min:36,secs:32,pay:[4000,5600],wear:15,energy:34,loot:0.1,gearDrop:0.03,mat:{name:"Tourney Ribbon",icon:"medal",v:[3000,5000]},prefix:"Champion's"},
+  {key:"basilisk",tier:4,name:"Basilisk Den",where:"Stonefall Quarry",min:44,secs:40,pay:[5200,7800],wear:20,energy:42,loot:0.12,gearDrop:0.04,mat:{name:"Basilisk Eye",icon:"gem",v:[5500,8500]},prefix:"Stoneguard"},
+  {key:"banditking",tier:4,name:"Bandit King's Fort",where:"Redcliff",min:46,secs:42,pay:[5500,8200],wear:21,energy:44,loot:0.12,gearDrop:0.04,mat:{name:"Bandit King's Signet",icon:"trinket",v:[6000,9000]},prefix:"Bandit King's"},
+  {key:"manor",tier:4,name:"Haunted Manor",where:"Ravensworth Hall",min:48,secs:42,pay:[5800,8500],wear:20,energy:44,loot:0.12,gearDrop:0.04,mat:{name:"Spectral Locket",icon:"trinket",v:[6000,9500]},prefix:"Ghostly"},
+  {key:"kraken",tier:5,name:"Kraken in the Harbor",where:"Port Merrow",min:55,secs:52,pay:[8800,12200],wear:28,energy:50,loot:0.14,gearDrop:0.05,mat:{name:"Barrel of Kraken Ink",icon:"bottle",v:[10000,16000]},prefix:"Krakenhide"},
+  {key:"yeti",tier:5,name:"The Frostpeak Yeti",where:"Frostpeak Pass",min:56,secs:54,pay:[9200,12800],wear:30,energy:54,loot:0.15,gearDrop:0.05,mat:{name:"Yeti Fur",icon:"pelt",v:[11000,17000]},prefix:"Frostbound"},
+  {key:"lich",tier:6,name:"The Drowned Lich",where:"Sunken Abbey",min:59,secs:58,pay:[15600,21900],wear:40,energy:56,loot:0.18,gearDrop:0.07,mat:{name:"Lich's Phylactery Shard",icon:"skull",v:[16000,26000]},prefix:"Lichbane"},
+  {key:"reunion",tier:6,name:"One Last Dungeon",where:"Hollowdeep",min:60,secs:60,pay:[16900,23800],wear:44,energy:60,loot:0.18,gearDrop:0.07,mat:{name:"Ancient Crown",icon:"medal",v:[19000,29000]},prefix:"Hero's"}
 ];
 // Story: each quest has two hand-written storylines (paths). One is picked per trip and played in order.
 // {weapon} {shield} {armor} {helm} {boots} become your equipped gear, or a body part if that slot is empty.
@@ -1049,7 +1051,7 @@ const STORY_ROAD = [
 ];
 const TIER_COLOR = ['var(--r-common)','var(--r-common)','var(--good)','var(--r-rare)','var(--r-rare)','var(--r-epic)','var(--r-legendary)'];
 const TIER_NAME = ['Odd job','Easy','Easy','Medium','Hard','Hard','Deadly'];
-const GEAR_BASES = {weapon:['Cleaver','Longsword','Warhammer','Spear'],armor:['Brigandine','Chainmail','Scale Coat'],shield:['Buckler','Tower Shield','Round Shield'],helm:['Sallet','Coif','Great Helm'],boots:['Greaves','Riding Boots','Sabatons']};
+const GEAR_BASES = {trinket:['Pendant','Signet Ring','Amulet','Charm','Band'],weapon:['Cleaver','Longsword','Warhammer','Spear'],armor:['Brigandine','Chainmail','Scale Coat'],shield:['Buckler','Tower Shield','Round Shield'],helm:['Sallet','Coif','Great Helm'],boots:['Greaves','Riding Boots','Sabatons']};
 const KEY = 'rust-retirement-v2';
 const HKEY = 'rust-retirement-history';
 function loadHist(){ try{ const h=JSON.parse(localStorage.getItem(HKEY)||'[]'); return Array.isArray(h)?h:[]; }catch(e){ return []; } }
@@ -1080,6 +1082,7 @@ const ICON = {
   shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 7v10M8 11h8"/>',
   helm:'<path d="M4 16a8 8 0 0116 0v3H4z"/><path d="M12 8v11M4 16h16"/>',
   boots:'<path d="M7 3h6v10l6 3v4H5v-4z"/><path d="M5 17h14"/>',
+  trinket:'<path d="M5 3c0 7 3 10.5 7 10.5S19 10 19 3"/><circle cx="12" cy="17" r="3.5"/><path d="M12 15.5v3"/>',
   crate:'<rect x="4" y="6" width="16" height="13" rx="1"/><path d="M4 11h16M10 6v13"/>',
   pelt:'<path d="M6 4c2 2 10 2 12 0l-1 7 2 9H5l2-9z"/>',
   trinket:'<circle cx="12" cy="14" r="6"/><path d="M12 8V3M10 14l2-2 2 2-2 2z"/>',
@@ -1120,6 +1123,10 @@ const plain = cp => fmt(cp).replace(/<[^>]+>/g,'');
 const gShort = cp => cp>=100 ? '<span class="num">'+Math.floor(cp/100).toLocaleString()+'<i class="gp">g</i></span>' : fmt(cp);
 const esc = s => String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 const job = k => JOBS.find(j=>j.key===k);
+// luck from intact trinkets raises loot and gear drop chances
+const luck = ()=>SLOTS.reduce((a,k)=>{ const g=S.eq[k]; return a+(g&&g.dur>0&&g.luck?g.luck:0); },0);
+const lootChance = j=>Math.min(.95,j.loot*(1+luck()));
+const gearChance = j=>Math.min(.95,j.gearDrop*(1+luck()));
 const season = ()=>SEASONS[Math.floor((S.day-1)/SEASON_DAYS)%SEASONS.length];
 const weather = ()=>WEATHER[S.weather]||WEATHER.clear;
 function wx(){ const w=weather(), sn=season(); return {wear:w.wear, pay:w.pay*(sn.pay||1), energy:w.energy, odds:w.odds}; }
@@ -1157,7 +1164,9 @@ function sellValue(it){
   if(it.kind==='mat') return Math.round(it.value*marketMult(it.name));
   if(it.dur<=0) return Math.round(it.sell*.1);
   const r=it.dur/it.max;
-  return Math.round(it.sell*(it.rarity==='legendary'?.6+.4*r:.4+.6*r));
+  // worn gear is worth less: sell early for the big payout, or use it up
+  const floor=it.rarity==='legendary'?.15:.1;
+  return Math.round(it.sell*(floor+(1-floor)*r));
 }
 const rerollCost = ()=>Math.round(CFG.rerollBase*Math.pow(CFG.rerollGrowth,S.rerolls||0));
 const inTown = ()=>!S.trip && !S.ended;
@@ -1181,7 +1190,8 @@ function genGear(j){
   const power=Math.max(1,Math.round(BASE_POWER[slot]*f*m*(.85+Math.random()*.3)));
   const max=Math.round(BASE_MAX[slot]*(.55+Math.random()*.4));
   return {uid:S.nextId++, kind:'gear', slot, rarity, name:j.prefix+' '+pick(GEAR_BASES[slot]),
-    power, max, dur:Math.round(max*(.6+Math.random()*.4)), repairs:0, repairBase:power*250, sell:Math.round(power*500*m)};
+    power, max, dur:Math.round(max*(.6+Math.random()*.4)), repairs:0, repairBase:power*250, sell:Math.round(power*500*m),
+    ...(slot==='trinket'?{luck:{common:.1,rare:.2,epic:.3,legendary:.5}[rarity]}:{})};
 }
 function addToBag(it){
   if(S.bag.length>=CFG.bagSize){ log('Your bag is full, so you leave the '+it.name+' behind.','bad'); return false; }
@@ -1220,9 +1230,14 @@ function startDay(){
   }
 }
 function applyWear(total){
-  const l=live(); if(!l.length||total<=0) return [];
-  const w=l.map(g=>WEAR_WEIGHT[g.slot]*(.7+Math.random()*.6)), sum=w.reduce((a,b)=>a+b,0), broke=[];
-  l.forEach((g,i)=>{ const d=Math.max(total>=5?1:0,Math.round(total*w[i]/sum)); g.dur=Math.max(0,g.dur-d); if(g.dur===0) broke.push(g); });
+  // every point of wear lands on one piece, picked by weight, so small jobs wear gear too
+  const broke=[];
+  for(let n=0;n<total;n++){
+    const l=live(); if(!l.length) break;
+    const w=l.map(g=>WEAR_WEIGHT[g.slot]*(.7+Math.random()*.6)); let r=Math.random()*w.reduce((a,b)=>a+b,0), k=0;
+    while(k<l.length-1 && r>=w[k]){ r-=w[k]; k++; }
+    l[k].dur--; if(l[k].dur===0) broke.push(l[k]);
+  }
   return broke;
 }
 function endGame(reason){
@@ -1262,10 +1277,10 @@ function buildScript(j){
   beats.forEach((t,i)=>out.push({at:.18+(.62*(i+.5)/beats.length),t}));
   return out;
 }
-const STORY_FALLBACK = {weapon:'your fist',shield:'your forearm',armor:'your bare chest',helm:'your bare head',boots:'your bare feet'};
+const STORY_FALLBACK = {weapon:'your fist',shield:'your forearm',armor:'your bare chest',helm:'your bare head',boots:'your bare feet',trinket:'your empty pocket'};
 function gearRef(g){ const short=g.name.split(',')[0].replace(/ of .*$/,''); return g.name.includes(',')?short:'your '+short; }
 function storyText(t){
-  t=t.replace(/\{(weapon|shield|armor|helm|boots|gear)\}/g,(m,k)=>{
+  t=t.replace(/\{(weapon|shield|armor|helm|boots|trinket|gear)\}/g,(m,k)=>{
     if(k==='gear'){ const l=live(); return l.length?gearRef(pick(l)):'your gear'; }
     const g=S.eq[k]; return g&&g.dur>0?gearRef(g):STORY_FALLBACK[k];
   });
@@ -1285,11 +1300,11 @@ function resolveTrip(){
   broke.forEach(g=>{ log(g.name+' breaks.','bad'); log(goodbye(g),'story'); });
   if(broke.length) setTimeout(()=>sfx('break'),350);
   maybeInjure(j,ok);
-  if(Math.random()<(ok?j.loot:j.loot*.3)){
+  if(Math.random()<(ok?lootChance(j):lootChance(j)*.3)){
     const it={uid:S.nextId++, kind:'mat', name:j.mat.name, icon:j.mat.icon, rarity:'common', value:rand(j.mat.v[0],j.mat.v[1])};
     if(addToBag(it)){ log('Loot: '+it.name+' (usually worth '+plain(it.value)+').','loot'); sfx('loot'); }
   }
-  if(ok && Math.random()<j.gearDrop){
+  if(ok && Math.random()<gearChance(j)){
     const g=genGear(j);
     if(addToBag(g)){ log('Loot: '+RARITY[g.rarity].label+' '+g.name+' ('+g.power+' power).','loot'); sfx('loot'); }
   }
@@ -1449,18 +1464,18 @@ function slotHTML(k){
   const g=S.eq[k], sel=S.selSlot===k?' sel':'';
   if(!g) return '<button class="slot empty'+sel+'" data-a="selSlot" data-id="'+k+'" aria-label="'+SLOT_NAME[k]+': empty"'+tip(SLOT_NAME[k]+' slot',['Empty. Equip something from your bag.'])+'>'+ic(k)+'<span class="sname">'+SLOT_NAME[k]+'</span></button>';
   const r=g.dur/g.max, dc=r<.25?'low':r<.5?'mid':'';
-  return '<button class="slot'+(g.dur<=0?' broken':'')+sel+'" style="--rc:'+RARITY[g.rarity].c+'" data-a="selSlot" data-id="'+k+'" aria-label="'+esc(g.name)+'"'+tip(g.name,[RARITY[g.rarity].label+' '+SLOT_NAME[g.slot].toLowerCase(),'Power '+g.power+(g.dur>0&&r<.25?' (fighting at half power)':''),'Durability '+g.dur+'/'+g.max+(g.dur<=0?' · broken':''),'Repaired '+g.repairs+' time'+(g.repairs===1?'':'s')])+'>'+ic(k)+
+  return '<button class="slot'+(g.dur<=0?' broken':'')+sel+'" style="--rc:'+RARITY[g.rarity].c+'" data-a="selSlot" data-id="'+k+'" aria-label="'+esc(g.name)+'"'+tip(g.name,[RARITY[g.rarity].label+' '+SLOT_NAME[g.slot].toLowerCase(),'Power '+g.power+(g.dur>0&&r<.25?' (fighting at half power)':''),'Durability '+g.dur+'/'+g.max+(g.dur<=0?' · broken':''),g.luck?'Luck +'+Math.round(g.luck*100)+'%: more loot and gear drops'+(g.dur<=0?' (gone while broken)':''):'','Repaired '+g.repairs+' time'+(g.repairs===1?'':'s')])+'>'+ic(k)+
     '<span class="dbar '+dc+'"><span style="width:'+r*100+'%"></span></span></button>';
 }
 
 function renderGear(){
-  document.getElementById('intact').textContent=live().length+' of 5 intact';
+  document.getElementById('intact').textContent=live().length+' of '+SLOTS.length+' intact';
   const nextM=MILESTONES[(S.ms===undefined?-1:S.ms)+1];
   let h='<div class="doll"><div class="slots">'+['helm','armor','boots'].map(slotHTML).join('')+'</div>'+
     '<div class="center"><div class="cstat hero"'+tip('Combat power',SLOTS.map(k=>S.eq[k]?SLOT_NAME[k]+': '+Math.round(gearPower(S.eq[k])):SLOT_NAME[k]+': empty').concat(injuries().filter(i=>i.power).map(i=>i.name+': '+i.power)))+'><span class="label">Power</span><b>'+power()+'</b></div>'+
     '<div class="cstat"'+tip('Energy',[S.energy+' of '+maxE(),...injuries().filter(i=>i.energy).map(i=>i.name+': '+i.energy+' max'),'Eaten today: '+(S.rationsToday||0)+' ration'+((S.rationsToday||0)===1?'':'s')])+'><span class="label">Energy</span><b>'+S.energy+'<small>/'+maxE()+'</small></b></div>'+
     '<div class="cstat"'+tip('Farm milestones',MILESTONES.map((m,i)=>(i<=(S.ms??-1)?'✓ ':'· ')+m.name+' · '+(m.at/100).toLocaleString()+'g'))+'><span class="label">Next goal'+(nextM?' · '+Math.floor(nextM.at/100).toLocaleString()+'g':'')+'</span><b class="farmnext">'+(nextM?esc(nextM.name):'All saved up')+'</b></div></div>'+
-    '<div class="slots">'+['weapon','shield'].map(slotHTML).join('')+'</div></div>';
+    '<div class="slots">'+['weapon','shield','trinket'].map(slotHTML).join('')+'</div></div>';
   const g=S.eq[S.selSlot];
   if(!g){
     h+='<div class="detail"><div class="dtop"><span class="nm">'+SLOT_NAME[S.selSlot]+' slot</span><span class="dsub">Empty</span></div><p class="empty-note">Equip something from your bag.</p></div>';
@@ -1468,7 +1483,7 @@ function renderGear(){
     const r=g.dur/g.max, dc=r<.25?'low':r<.5?'mid':'', rc=repairCost(g);
     const state=g.dur<=0?'<span class="dsub" style="color:var(--bad)">Broken</span>':r<.25?'<span class="dsub" style="color:var(--gold)" title="Under 25% durability fights at half power">Worn · half power</span>':'<span class="dsub">'+RARITY[g.rarity].label+'</span>';
     h+='<div class="detail"><div class="dtop"><span class="nm" style="color:'+RARITY[g.rarity].c+'" title="'+esc(g.name)+'">'+esc(g.name)+'</span>'+state+'</div>'+
-      '<div class="meta"><span>Power <b>'+g.power+'</b></span><span>Repairs <b>'+g.repairs+'</b></span><span>Worth <b>'+fmt(sellValue(g),true)+'</b></span></div>'+
+      '<div class="meta"><span>Power <b>'+g.power+'</b></span>'+(g.luck?'<span>Luck <b class="luck">+'+Math.round(g.luck*100)+'%</b></span>':'<span>Repairs <b>'+g.repairs+'</b></span>')+'<span>Worth <b>'+fmt(sellValue(g),true)+'</b></span></div>'+
       '<div class="drow"><div class="durrow '+dc+'"><div class="bar"><span style="width:'+r*100+'%"></span></div><span class="num">'+g.dur+'/'+g.max+'</span></div>'+
       '<div class="acts">'+(S.pendingSell==='eq'
         ? '<button class="confirm" data-a="sellEq">Sell for '+plain(sellValue(g))+'</button><button data-a="sellCancel">Keep it</button>'
@@ -1556,7 +1571,7 @@ function renderAdv(){
       '<div class="badge">'+ic(JOB_ICON[j.key])+'</div>'+
       '<div class="ttl"><h3>'+esc(j.name)+'</h3><span class="tier">'+TIER_NAME[j.tier]+' · '+esc(j.where)+(done?' · <span class="donetag">Done today</span>':'')+(!locked&&S.energy<jobEnergy(j)?' · <span class="tired">Too tired, odds halved</span>':'')+'</span></div>'+
       '<div class="stats"><span'+tip('Pays',['Gold for a success.','A failure pays only 25%.',wx().pay!==1?'Weather and season are already included.':''])+'>Pays<b>'+pay+'</b></span><span'+tip('Time',['How long this quest takes in real time.'])+'>Time<b>'+j.secs+'s</b></span><span'+tip('Wear',['Durability lost, spread across your gear.','A failure wears 50% more.',weather().wear!==1?weather().name+' is already included.':''])+'>Wear<b>'+jobWear(j)+'</b></span>'+
-      '<span'+tip('Energy',['Used when you set out.','Setting out with less than this halves your odds.'])+'>Energy<b>−'+jobEnergy(j)+'</b></span><span'+tip('Loot',[Math.round(j.loot*100)+'% chance of '+j.mat.name,j.gearDrop?Math.round(j.gearDrop*100)+'% chance of a gear drop':'No gear drops here'])+'>Loot<b>'+Math.round(j.loot*100)+'%</b></span><span'+tip('Odds',['Chance of success.','Needs '+j.min+' power. You have '+power()+'.',weather().odds?weather().name+': '+Math.round(weather().odds*100)+'%':'',S.energy<jobEnergy(j)?'Too tired: odds halved':''])+'>Odds<b class="odds '+oc+'">'+(c===0?'–':Math.round(c*100)+'%')+(wx().odds?'<i class="wxodd" title="'+esc(weather().name)+'"> '+Math.round(wx().odds*100)+'</i>':'')+'</b></span></div>'+
+      '<span'+tip('Energy',['Used when you set out.','Setting out with less than this halves your odds.'])+'>Energy<b>−'+jobEnergy(j)+'</b></span><span'+tip('Loot',[Math.round(lootChance(j)*100)+'% chance of '+j.mat.name,j.gearDrop?Math.round(gearChance(j)*100)+'% chance of a gear drop':'No gear drops here',luck()?'Luck +'+Math.round(luck()*100)+'% from your trinket is included':''])+'>Loot<b'+(luck()?' class="luck"':'')+'>'+Math.round(lootChance(j)*100)+'%</b></span><span'+tip('Odds',['Chance of success.','Needs '+j.min+' power. You have '+power()+'.',weather().odds?weather().name+': '+Math.round(weather().odds*100)+'%':'',S.energy<jobEnergy(j)?'Too tired: odds halved':''])+'>Odds<b class="odds '+oc+'">'+(c===0?'–':Math.round(c*100)+'%')+(wx().odds?'<i class="wxodd" title="'+esc(weather().name)+'"> '+Math.round(wx().odds*100)+'</i>':'')+'</b></span></div>'+
       '<button class="go '+(locked?'':'primary')+'" data-a="job" data-id="'+j.key+'" '+(locked||S.ended?'disabled':'')+'>'+(done?'Done':locked?'Needs '+j.min:'Set out')+'</button></div>';
   });
   body.innerHTML=h+'</div>';
@@ -1577,7 +1592,7 @@ function renderBag(){
     if(!it){ h+='<div class="cell blank"></div>'; continue; }
     const iconK=it.kind==='mat'?it.icon:it.slot;
     const up=it.kind==='gear'&&gearPower(it)>gearPower(S.eq[it.slot]), mk=it.kind==='mat'?marketMult(it.name):1;
-    h+='<button class="cell'+(S.selBag===it.uid?' sel':'')+'" style="--rc:'+(it.kind==='mat'?'#6b7486':RARITY[it.rarity].c)+'" data-a="selBag" data-id="'+it.uid+'" aria-label="'+esc(it.name)+'"'+(it.kind==='mat'?tip(it.name,['Material','Sells for '+plain(sellValue(it))+' today ('+mk.toFixed(2)+'x usual)']):tip(it.name,[RARITY[it.rarity].label+' '+SLOT_NAME[it.slot].toLowerCase(),'Power '+it.power+' · durability '+it.dur+'/'+it.max,up?'Stronger than what you have equipped':'']))+'>'+ic(iconK)+(up||mk>=1.2?'<span class="up">▲</span>':mk<=.8?'<span class="dn">▼</span>':'')+'</button>';
+    h+='<button class="cell'+(S.selBag===it.uid?' sel':'')+'" style="--rc:'+(it.kind==='mat'?'#6b7486':RARITY[it.rarity].c)+'" data-a="selBag" data-id="'+it.uid+'" aria-label="'+esc(it.name)+'"'+(it.kind==='mat'?tip(it.name,['Material','Sells for '+plain(sellValue(it))+' today ('+mk.toFixed(2)+'x usual)']):tip(it.name,[RARITY[it.rarity].label+' '+SLOT_NAME[it.slot].toLowerCase(),'Power '+it.power+' · durability '+it.dur+'/'+it.max,it.luck?'Luck +'+Math.round(it.luck*100)+'%':'',up?'Stronger than what you have equipped':'']))+'>'+ic(iconK)+(up||mk>=1.2?'<span class="up">▲</span>':mk<=.8?'<span class="dn">▼</span>':'')+'</button>';
   }
   h+='</div><div class="bagdetail">';
   const it=S.bag.find(x=>x.uid===S.selBag);
@@ -1593,7 +1608,7 @@ function renderBag(){
   } else {
     const cur=S.eq[it.slot], diff=Math.round(gearPower(it)-gearPower(cur)), r=it.dur/it.max, dc=r<.25?'low':r<.5?'mid':'';
     h+='<div class="detail"><div class="dtop"><span class="nm" style="color:'+RARITY[it.rarity].c+'" title="'+esc(it.name)+'">'+esc(it.name)+'</span><span class="dsub">'+SLOT_NAME[it.slot]+' · '+RARITY[it.rarity].label+'</span></div>'+
-      '<div class="meta"><span>Power <b>'+it.power+'</b> <span style="color:'+(diff>0?'var(--good)':diff<0?'var(--bad)':'var(--muted)')+'">('+(diff>0?'+':'')+diff+' vs equipped)</span></span></div>'+
+      '<div class="meta"><span>Power <b>'+it.power+'</b> <span style="color:'+(diff>0?'var(--good)':diff<0?'var(--bad)':'var(--muted)')+'">('+(diff>0?'+':'')+diff+' vs equipped)</span></span>'+(it.luck?'<span>Luck <b class="luck">+'+Math.round(it.luck*100)+'%</b></span>':'')+'</div>'+
       '<div class="drow"><div class="durrow '+dc+'"><div class="bar"><span style="width:'+r*100+'%"></span></div><span class="num">'+it.dur+'/'+it.max+'</span></div>'+
       '<div class="acts"><button class="primary" data-a="equip" '+(!inTown()?'disabled':'')+'>Equip</button><button data-a="sellBag" '+(!inTown()?'disabled':'')+'>Sell · '+gShort(sellValue(it))+'</button></div></div></div>';
   }
@@ -1732,6 +1747,7 @@ document.addEventListener('change',e=>{
 S=load();
 if(S){
   if(S.started===undefined) S.started=true; // saves from before the start screen existed
+  if(S.eq && S.eq.trinket===undefined){ const g=START_GEAR.find(x=>x.slot==='trinket'); S.eq.trinket={...g, uid:S.nextId++, kind:'gear', dur:g.max, repairs:0}; }
   if(!S.injuries) S.injuries=[];
   if(S.questsToday===undefined){ S.questsToday=0; S.doneToday=[]; }
   if(!S.market) rollMarket();
