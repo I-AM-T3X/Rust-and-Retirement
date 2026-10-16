@@ -89,7 +89,7 @@ You start with six pieces: weapon, armor, shield, helm, boots, and a trinket. Ea
 - **Worn gear:** Anything under 25% durability fights at half power.
 - **Repairs:** You can repair gear, but every repair on the same piece costs 1.6x more than the last one.
 - **Selling:** Gear is worth less the more worn it is. Your legendary sword, Emberbrand, sells for 2,500 gold on day one, about 1,400 at half durability, and only a few hundred once it's nearly broken. Sell it early for a guaranteed head start, or keep it for the big quests and accept that it loses value every time you swing it.
-- **Trinkets:** Rings, necklaces, and charms barely add power, but they bring luck, which raises your loot and gear drop chances. You start with the **Lucky Coin Necklace** (+50% luck), your very first payday on a cord. Jewelry rarely takes a hit, so it tends to outlast your other gear. Trinkets you find can roll their own luck, from +10% (common) up to +50% (legendary). The loot numbers on the quest cards turn teal when luck is boosting them.
+- **Trinkets:** Rings, necklaces, and charms barely add power, but they bring luck, which raises your loot and gear drop chances. You start with the **Lucky Coin Necklace** (×1.5 luck, so a quest with an 18% loot chance becomes 27%), your very first payday on a cord. Jewelry rarely takes a hit, so it tends to outlast your other gear. Trinkets you find can roll their own luck, from ×1.1 (common) up to ×1.5 (legendary). The loot numbers on the quest cards turn teal when luck is boosting them.
 - **Saying goodbye:** When a piece breaks, the journal gives it a send-off. Your starting gear each has its own goodbye line.
 
 ## Injuries
